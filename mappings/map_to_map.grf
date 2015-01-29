@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph __version="3.5.0" author="Admin" created="Tue Jan 27 14:06:31 CET 2015" description="Map To Map" guiVersion="3.4.4.P" id="1422366052643" licenseCode="Unlicensed" licenseType="Unknown" modified="Tue Jan 27 14:06:31 CET 2015" modifiedBy="Admin" name="Map_To_Map" revision="1.0" showComponentDetails="false">
+<Global>
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/Map" _dataStructure="OBJECT" _id="__id" _type="Input" id="6f3df6ed-a458-4f3e-a28c-681653b374fa">
+<Record fieldDelimiter="," name="Map" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __implementationClass="java.lang.String" __index="5" __sourcePath="{}/Map/accumulatedRoles" containerType="SINGLE" label="accumulatedRoles" name="accumulatedRoles" type="string"/>
+<Field __implementationClass="java.lang.Boolean" __index="21" __sourcePath="{}/Map/active" containerType="SINGLE" label="active" name="active" type="boolean"/>
+<Field __implementationClass="java.lang.String" __index="8" __sourcePath="{}/Map/building" containerType="SINGLE" label="building" name="building" type="string"/>
+<Field __implementationClass="java.math.BigDecimal" __index="37" __sourcePath="{}/Map/calendarIntegration" containerType="SINGLE" label="calendarIntegration" name="calendarIntegration" type="decimal"/>
+<Field __implementationClass="java.lang.String" __index="33" __sourcePath="{}/Map/city" containerType="SINGLE" label="city" name="city" type="string"/>
+<Field __implementationClass="java.lang.String" __index="39" __sourcePath="{}/Map/company" containerType="SINGLE" label="company" name="company" type="string"/>
+<Field __implementationClass="java.lang.String" __index="19" __sourcePath="{}/Map/costCenter" containerType="SINGLE" label="costCenter" name="costCenter" type="string"/>
+<Field __implementationClass="java.lang.String" __index="1" __sourcePath="{}/Map/country" containerType="SINGLE" label="country" name="country" type="string"/>
+<Field __implementationClass="java.lang.String" __index="4" __sourcePath="{}/Map/dateFormat" containerType="SINGLE" label="dateFormat" name="dateFormat" type="string"/>
+<Field __implementationClass="java.lang.String" __index="9" __sourcePath="{}/Map/defaultPerspective" containerType="SINGLE" label="defaultPerspective" name="defaultPerspective" type="string"/>
+<Field __implementationClass="java.lang.String" __index="40" __sourcePath="{}/Map/department" containerType="SINGLE" label="department" name="department" type="string"/>
+<Field __implementationClass="java.lang.String" __index="42" __sourcePath="{}/Map/email" containerType="SINGLE" label="email" name="email" type="string"/>
+<Field __implementationClass="java.lang.String" __index="10" __sourcePath="{}/Map/employeeNumber" containerType="SINGLE" label="employeeNumber" name="employeeNumber" type="string"/>
+<Field __implementationClass="java.math.BigDecimal" __index="46" __sourcePath="{}/Map/failedAttempts" containerType="SINGLE" label="failedAttempts" name="failedAttempts" type="decimal"/>
+<Field __implementationClass="java.lang.String" __index="23" __sourcePath="{}/Map/firstName" containerType="SINGLE" label="firstName" name="firstName" type="string"/>
+<Field __implementationClass="java.lang.String" __index="32" __sourcePath="{}/Map/gender" containerType="SINGLE" label="gender" name="gender" type="string"/>
+<Field __implementationClass="java.lang.String" __index="20" __sourcePath="{}/Map/homePhone" containerType="SINGLE" label="homePhone" name="homePhone" type="string"/>
+<Field __implementationClass="java.lang.Boolean" __index="28" __sourcePath="{}/Map/internalIntegrationUser" containerType="SINGLE" label="internalIntegrationUser" name="internalIntegrationUser" type="boolean"/>
+<Field __implementationClass="java.lang.String" __index="43" __sourcePath="{}/Map/introduction" containerType="SINGLE" label="introduction" name="introduction" type="string"/>
+<Field __implementationClass="java.lang.String" __index="2" __sourcePath="{}/Map/lastLogin" containerType="SINGLE" label="lastLogin" name="lastLogin" type="string"/>
+<Field __implementationClass="java.lang.String" __index="50" __sourcePath="{}/Map/lastLoginTime" containerType="SINGLE" label="lastLoginTime" name="lastLoginTime" type="string"/>
+<Field __implementationClass="java.lang.String" __index="29" __sourcePath="{}/Map/lastName" containerType="SINGLE" label="lastName" name="lastName" type="string"/>
+<Field __implementationClass="java.lang.String" __index="44" __sourcePath="{}/Map/ldapServer" containerType="SINGLE" label="ldapServer" name="ldapServer" type="string"/>
+<Field __implementationClass="java.lang.String" __index="53" __sourcePath="{}/Map/location" containerType="SINGLE" label="location" name="location" type="string"/>
+<Field __implementationClass="java.lang.Boolean" __index="27" __sourcePath="{}/Map/lockedOut" containerType="SINGLE" label="lockedOut" name="lockedOut" type="boolean"/>
+<Field __implementationClass="java.lang.String" __index="45" __sourcePath="{}/Map/manager" containerType="SINGLE" label="manager" name="manager" type="string"/>
+<Field __implementationClass="java.lang.String" __index="54" __sourcePath="{}/Map/middleName" containerType="SINGLE" label="middleName" name="middleName" type="string"/>
+<Field __implementationClass="java.lang.String" __index="24" __sourcePath="{}/Map/mobilePhone" containerType="SINGLE" label="mobilePhone" name="mobilePhone" type="string"/>
+<Field __implementationClass="java.lang.String" __index="26" __sourcePath="{}/Map/name" containerType="SINGLE" label="name" name="name" type="string"/>
+<Field __implementationClass="java.math.BigDecimal" __index="11" __sourcePath="{}/Map/notification" containerType="SINGLE" label="notification" name="notification" type="decimal"/>
+<Field __implementationClass="java.lang.Boolean" __index="13" __sourcePath="{}/Map/passwordNeedsReset" containerType="SINGLE" label="passwordNeedsReset" name="passwordNeedsReset" type="boolean"/>
+<Field __implementationClass="java.lang.String" __index="25" __sourcePath="{}/Map/phone" containerType="SINGLE" label="phone" name="phone" type="string"/>
+<Field __implementationClass="java.lang.String" __index="48" __sourcePath="{}/Map/photo" containerType="SINGLE" label="photo" name="photo" type="string"/>
+<Field __implementationClass="java.lang.String" __index="30" __sourcePath="{}/Map/preferredLanguage" containerType="SINGLE" label="preferredLanguage" name="preferredLanguage" type="string"/>
+<Field __implementationClass="java.lang.String" __index="35" __sourcePath="{}/Map/roles" containerType="SINGLE" label="roles" name="roles" type="string"/>
+<Field __implementationClass="java.lang.String" __index="51" __sourcePath="{}/Map/schedule" containerType="SINGLE" label="schedule" name="schedule" type="string"/>
+<Field __implementationClass="java.lang.String" __index="7" __sourcePath="{}/Map/source" containerType="SINGLE" label="source" name="source" type="string"/>
+<Field __implementationClass="java.lang.String" __index="16" __sourcePath="{}/Map/state" containerType="SINGLE" label="state" name="state" type="string"/>
+<Field __implementationClass="java.lang.String" __index="38" __sourcePath="{}/Map/street" containerType="SINGLE" label="street" name="street" type="string"/>
+<Field __implementationClass="java.lang.String" __index="47" __sourcePath="{}/Map/sysClassName" containerType="SINGLE" label="sysClassName" name="sysClassName" type="string"/>
+<Field __implementationClass="java.lang.String" __index="12" __sourcePath="{}/Map/sysCreatedBy" containerType="SINGLE" label="sysCreatedBy" name="sysCreatedBy" type="string"/>
+<Field __implementationClass="java.lang.String" __index="15" __sourcePath="{}/Map/sysCreatedOn" containerType="SINGLE" label="sysCreatedOn" name="sysCreatedOn" type="string"/>
+<Field __implementationClass="java.lang.String" __index="0" __sourcePath="{}/Map/sysDomain" containerType="SINGLE" label="sysDomain" name="sysDomain" type="string"/>
+<Field __implementationClass="java.lang.String" __index="34" __sourcePath="{}/Map/sysId" containerType="SINGLE" label="sysId" name="sysId" type="string"/>
+<Field __implementationClass="java.math.BigDecimal" __index="41" __sourcePath="{}/Map/sysModCount" containerType="SINGLE" label="sysModCount" name="sysModCount" type="decimal"/>
+<Field __implementationClass="java.lang.String" __index="3" __sourcePath="{}/Map/sysUpdatedBy" containerType="SINGLE" label="sysUpdatedBy" name="sysUpdatedBy" type="string"/>
+<Field __implementationClass="java.lang.String" __index="6" __sourcePath="{}/Map/sysUpdatedOn" containerType="SINGLE" label="sysUpdatedOn" name="sysUpdatedOn" type="string"/>
+<Field __implementationClass="java.lang.String" __index="52" __sourcePath="{}/Map/timeFormat" containerType="SINGLE" label="timeFormat" name="timeFormat" type="string"/>
+<Field __implementationClass="java.lang.String" __index="22" __sourcePath="{}/Map/timeZone" containerType="SINGLE" label="timeZone" name="timeZone" type="string"/>
+<Field __implementationClass="java.lang.String" __index="36" __sourcePath="{}/Map/title" containerType="SINGLE" label="title" name="title" type="string"/>
+<Field __implementationClass="java.lang.String" __index="49" __sourcePath="{}/Map/userName" containerType="SINGLE" label="userName" name="userName" type="string"/>
+<Field __implementationClass="java.lang.String" __index="31" __sourcePath="{}/Map/userPassword" containerType="SINGLE" label="userPassword" name="userPassword" type="string"/>
+<Field __implementationClass="java.lang.Boolean" __index="17" __sourcePath="{}/Map/vip" containerType="SINGLE" label="vip" name="vip" type="boolean"/>
+<Field __implementationClass="java.lang.Boolean" __index="14" __sourcePath="{}/Map/webServiceAccessOnly" containerType="SINGLE" label="webServiceAccessOnly" name="webServiceAccessOnly" type="boolean"/>
+<Field __implementationClass="java.lang.String" __index="18" __sourcePath="{}/Map/zip" containerType="SINGLE" label="zip" name="zip" type="string"/>
+</Record>
+</Metadata>
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/Map" _dataStructure="OBJECT" _id="__id" _type="Output" id="4990e87c-d795-49de-a17e-59d137419574">
+<Record fieldDelimiter="," name="Map" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __index="0" __sourcePath="{}/Map/accumulatedRoles" containerType="SINGLE" label="accumulatedRoles" name="accumulatedRoles" type="string"/>
+<Field __index="1" __sourcePath="{}/Map/active" containerType="SINGLE" label="active" name="active" type="boolean"/>
+<Field __index="2" __sourcePath="{}/Map/building" containerType="SINGLE" label="building" name="building" type="string"/>
+<Field __index="3" __sourcePath="{}/Map/calendarIntegration" containerType="SINGLE" label="calendarIntegration" name="calendarIntegration" type="decimal"/>
+<Field __index="4" __sourcePath="{}/Map/city" containerType="SINGLE" label="city" name="city" type="string"/>
+<Field __index="5" __sourcePath="{}/Map/company" containerType="SINGLE" label="company" name="company" type="string"/>
+<Field __index="6" __sourcePath="{}/Map/costCenter" containerType="SINGLE" label="costCenter" name="costCenter" type="string"/>
+<Field __index="7" __sourcePath="{}/Map/country" containerType="SINGLE" label="country" name="country" type="string"/>
+<Field __index="8" __sourcePath="{}/Map/dateFormat" containerType="SINGLE" label="dateFormat" name="dateFormat" type="string"/>
+<Field __index="9" __sourcePath="{}/Map/defaultPerspective" containerType="SINGLE" label="defaultPerspective" name="defaultPerspective" type="string"/>
+<Field __index="10" __sourcePath="{}/Map/department" containerType="SINGLE" label="department" name="department" type="string"/>
+<Field __index="11" __sourcePath="{}/Map/email" containerType="SINGLE" label="email" name="email" type="string"/>
+<Field __index="12" __sourcePath="{}/Map/employeeNumber" containerType="SINGLE" label="employeeNumber" name="employeeNumber" type="string"/>
+<Field __index="13" __sourcePath="{}/Map/failedAttempts" containerType="SINGLE" label="failedAttempts" name="failedAttempts" type="decimal"/>
+<Field __index="14" __sourcePath="{}/Map/firstName" containerType="SINGLE" label="firstName" name="firstName" type="string"/>
+<Field __index="15" __sourcePath="{}/Map/gender" containerType="SINGLE" label="gender" name="gender" type="string"/>
+<Field __index="16" __sourcePath="{}/Map/homePhone" containerType="SINGLE" label="homePhone" name="homePhone" type="string"/>
+<Field __index="17" __sourcePath="{}/Map/internalIntegrationUser" containerType="SINGLE" label="internalIntegrationUser" name="internalIntegrationUser" type="boolean"/>
+<Field __index="18" __sourcePath="{}/Map/introduction" containerType="SINGLE" label="introduction" name="introduction" type="string"/>
+<Field __index="19" __sourcePath="{}/Map/lastLogin" containerType="SINGLE" label="lastLogin" name="lastLogin" type="string"/>
+<Field __index="20" __sourcePath="{}/Map/lastLoginTime" containerType="SINGLE" label="lastLoginTime" name="lastLoginTime" type="string"/>
+<Field __index="21" __sourcePath="{}/Map/lastName" containerType="SINGLE" label="lastName" name="lastName" type="string"/>
+<Field __index="22" __sourcePath="{}/Map/ldapServer" containerType="SINGLE" label="ldapServer" name="ldapServer" type="string"/>
+<Field __index="23" __sourcePath="{}/Map/location" containerType="SINGLE" label="location" name="location" type="string"/>
+<Field __index="24" __sourcePath="{}/Map/lockedOut" containerType="SINGLE" label="lockedOut" name="lockedOut" type="boolean"/>
+<Field __index="25" __sourcePath="{}/Map/manager" containerType="SINGLE" label="manager" name="manager" type="string"/>
+<Field __index="26" __sourcePath="{}/Map/middleName" containerType="SINGLE" label="middleName" name="middleName" type="string"/>
+<Field __index="27" __sourcePath="{}/Map/mobilePhone" containerType="SINGLE" label="mobilePhone" name="mobilePhone" type="string"/>
+<Field __index="28" __sourcePath="{}/Map/name" containerType="SINGLE" label="name" name="name" type="string"/>
+<Field __index="29" __sourcePath="{}/Map/notification" containerType="SINGLE" label="notification" name="notification" type="decimal"/>
+<Field __index="30" __sourcePath="{}/Map/passwordNeedsReset" containerType="SINGLE" label="passwordNeedsReset" name="passwordNeedsReset" type="boolean"/>
+<Field __index="31" __sourcePath="{}/Map/phone" containerType="SINGLE" label="phone" name="phone" type="string"/>
+<Field __index="32" __sourcePath="{}/Map/photo" containerType="SINGLE" label="photo" name="photo" type="string"/>
+<Field __index="33" __sourcePath="{}/Map/preferredLanguage" containerType="SINGLE" label="preferredLanguage" name="preferredLanguage" type="string"/>
+<Field __index="34" __sourcePath="{}/Map/roles" containerType="SINGLE" label="roles" name="roles" type="string"/>
+<Field __index="35" __sourcePath="{}/Map/schedule" containerType="SINGLE" label="schedule" name="schedule" type="string"/>
+<Field __index="36" __sourcePath="{}/Map/source" containerType="SINGLE" label="source" name="source" type="string"/>
+<Field __index="37" __sourcePath="{}/Map/state" containerType="SINGLE" label="state" name="state" type="string"/>
+<Field __index="38" __sourcePath="{}/Map/street" containerType="SINGLE" label="street" name="street" type="string"/>
+<Field __index="39" __sourcePath="{}/Map/sysClassName" containerType="SINGLE" label="sysClassName" name="sysClassName" type="string"/>
+<Field __index="40" __sourcePath="{}/Map/sysCreatedBy" containerType="SINGLE" label="sysCreatedBy" name="sysCreatedBy" type="string"/>
+<Field __index="41" __sourcePath="{}/Map/sysCreatedOn" containerType="SINGLE" label="sysCreatedOn" name="sysCreatedOn" type="string"/>
+<Field __index="42" __sourcePath="{}/Map/sysDomain" containerType="SINGLE" label="sysDomain" name="sysDomain" type="string"/>
+<Field __index="43" __sourcePath="{}/Map/sysId" containerType="SINGLE" label="sysId" name="sysId" type="string"/>
+<Field __index="44" __sourcePath="{}/Map/sysModCount" containerType="SINGLE" label="sysModCount" name="sysModCount" type="decimal"/>
+<Field __index="45" __sourcePath="{}/Map/sysUpdatedBy" containerType="SINGLE" label="sysUpdatedBy" name="sysUpdatedBy" type="string"/>
+<Field __index="46" __sourcePath="{}/Map/sysUpdatedOn" containerType="SINGLE" label="sysUpdatedOn" name="sysUpdatedOn" type="string"/>
+<Field __index="47" __sourcePath="{}/Map/timeFormat" containerType="SINGLE" label="timeFormat" name="timeFormat" type="string"/>
+<Field __index="48" __sourcePath="{}/Map/timeZone" containerType="SINGLE" label="timeZone" name="timeZone" type="string"/>
+<Field __index="49" __sourcePath="{}/Map/title" containerType="SINGLE" label="title" name="title" type="string"/>
+<Field __index="50" __sourcePath="{}/Map/userName" containerType="SINGLE" label="userName" name="userName" type="string"/>
+<Field __index="51" __sourcePath="{}/Map/userPassword" containerType="SINGLE" label="userPassword" name="userPassword" type="string"/>
+<Field __index="52" __sourcePath="{}/Map/vip" containerType="SINGLE" label="vip" name="vip" type="boolean"/>
+<Field __index="53" __sourcePath="{}/Map/webServiceAccessOnly" containerType="SINGLE" label="webServiceAccessOnly" name="webServiceAccessOnly" type="boolean"/>
+<Field __index="54" __sourcePath="{}/Map/zip" containerType="SINGLE" label="zip" name="zip" type="string"/>
+</Record>
+</Metadata>
+<Dictionary>
+<Entry id="DictionaryEntry0" input="true" name="inputPayload" output="false" type="object"/>
+<Entry id="DictionaryEntry1" input="false" name="outputPayload" output="true" type="object"/>
+</Dictionary>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="dict:inputPayload" guiName="Map&lt;k,v&gt; READER" guiX="20" guiY="20" id="BEAN_READER0" type="BEAN_READER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Context outPort="0" sequenceField="__id" xpath=".">
+  <Mapping cloverField="accumulatedRoles" trim="true" xpath="accumulatedRoles"/>
+  <Mapping cloverField="active" trim="true" xpath="active"/>
+  <Mapping cloverField="building" trim="true" xpath="building"/>
+  <Mapping cloverField="calendarIntegration" trim="true" xpath="calendarIntegration"/>
+  <Mapping cloverField="city" trim="true" xpath="city"/>
+  <Mapping cloverField="company" trim="true" xpath="company"/>
+  <Mapping cloverField="costCenter" trim="true" xpath="costCenter"/>
+  <Mapping cloverField="country" trim="true" xpath="country"/>
+  <Mapping cloverField="dateFormat" trim="true" xpath="dateFormat"/>
+  <Mapping cloverField="defaultPerspective" trim="true" xpath="defaultPerspective"/>
+  <Mapping cloverField="department" trim="true" xpath="department"/>
+  <Mapping cloverField="email" trim="true" xpath="email"/>
+  <Mapping cloverField="employeeNumber" trim="true" xpath="employeeNumber"/>
+  <Mapping cloverField="failedAttempts" trim="true" xpath="failedAttempts"/>
+  <Mapping cloverField="firstName" trim="true" xpath="firstName"/>
+  <Mapping cloverField="gender" trim="true" xpath="gender"/>
+  <Mapping cloverField="homePhone" trim="true" xpath="homePhone"/>
+  <Mapping cloverField="internalIntegrationUser" trim="true" xpath="internalIntegrationUser"/>
+  <Mapping cloverField="introduction" trim="true" xpath="introduction"/>
+  <Mapping cloverField="lastLogin" trim="true" xpath="lastLogin"/>
+  <Mapping cloverField="lastLoginTime" trim="true" xpath="lastLoginTime"/>
+  <Mapping cloverField="lastName" trim="true" xpath="lastName"/>
+  <Mapping cloverField="ldapServer" trim="true" xpath="ldapServer"/>
+  <Mapping cloverField="location" trim="true" xpath="location"/>
+  <Mapping cloverField="lockedOut" trim="true" xpath="lockedOut"/>
+  <Mapping cloverField="manager" trim="true" xpath="manager"/>
+  <Mapping cloverField="middleName" trim="true" xpath="middleName"/>
+  <Mapping cloverField="mobilePhone" trim="true" xpath="mobilePhone"/>
+  <Mapping cloverField="name" trim="true" xpath="name"/>
+  <Mapping cloverField="notification" trim="true" xpath="notification"/>
+  <Mapping cloverField="passwordNeedsReset" trim="true" xpath="passwordNeedsReset"/>
+  <Mapping cloverField="phone" trim="true" xpath="phone"/>
+  <Mapping cloverField="photo" trim="true" xpath="photo"/>
+  <Mapping cloverField="preferredLanguage" trim="true" xpath="preferredLanguage"/>
+  <Mapping cloverField="roles" trim="true" xpath="roles"/>
+  <Mapping cloverField="schedule" trim="true" xpath="schedule"/>
+  <Mapping cloverField="source" trim="true" xpath="source"/>
+  <Mapping cloverField="state" trim="true" xpath="state"/>
+  <Mapping cloverField="street" trim="true" xpath="street"/>
+  <Mapping cloverField="sysClassName" trim="true" xpath="sysClassName"/>
+  <Mapping cloverField="sysCreatedBy" trim="true" xpath="sysCreatedBy"/>
+  <Mapping cloverField="sysCreatedOn" trim="true" xpath="sysCreatedOn"/>
+  <Mapping cloverField="sysDomain" trim="true" xpath="sysDomain"/>
+  <Mapping cloverField="sysId" trim="true" xpath="sysId"/>
+  <Mapping cloverField="sysModCount" trim="true" xpath="sysModCount"/>
+  <Mapping cloverField="sysUpdatedBy" trim="true" xpath="sysUpdatedBy"/>
+  <Mapping cloverField="sysUpdatedOn" trim="true" xpath="sysUpdatedOn"/>
+  <Mapping cloverField="timeFormat" trim="true" xpath="timeFormat"/>
+  <Mapping cloverField="timeZone" trim="true" xpath="timeZone"/>
+  <Mapping cloverField="title" trim="true" xpath="title"/>
+  <Mapping cloverField="userName" trim="true" xpath="userName"/>
+  <Mapping cloverField="userPassword" trim="true" xpath="userPassword"/>
+  <Mapping cloverField="vip" trim="true" xpath="vip"/>
+  <Mapping cloverField="webServiceAccessOnly" trim="true" xpath="webServiceAccessOnly"/>
+  <Mapping cloverField="zip" trim="true" xpath="zip"/>
+</Context>
+]]></attr>
+<attr name="__typeName"><![CDATA[SYS_USER]]></attr>
+<attr name="_data_format"><![CDATA[MAP]]></attr>
+<attr name="__connectorName"><![CDATA[ServiceNow]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Foreach 'Map' -&gt; 'Map'" guiX="460" guiY="20" id="FOREACH_MAP_MAP" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
+<attr name="melScript"><![CDATA[//MEL
+//START -> DO NOT REMOVE
+output.__id = input.__id;
+//END -> DO NOT REMOVE
+output.accumulatedRoles = input.accumulatedRoles;
+output.active = input.active;
+output.building = input.building;
+output.calendarIntegration = input.calendarIntegration;
+output.city = input.city;
+output.company = input.company;
+output.costCenter = input.costCenter;
+output.country = input.country;
+output.dateFormat = input.dateFormat;
+output.defaultPerspective = input.defaultPerspective;
+output.department = input.department;
+output.email = input.email;
+output.employeeNumber = input.employeeNumber;
+output.failedAttempts = input.failedAttempts;
+output.firstName = input.firstName;
+output.gender = input.gender;
+output.homePhone = input.homePhone;
+output.internalIntegrationUser = input.internalIntegrationUser;
+output.introduction = input.introduction;
+output.lastLogin = input.lastLogin;
+output.lastLoginTime = input.lastLoginTime;
+output.lastName = input.lastName;
+output.ldapServer = input.ldapServer;
+output.location = input.location;
+output.lockedOut = input.lockedOut;
+output.manager = input.manager;
+output.middleName = input.middleName;
+output.mobilePhone = input.mobilePhone;
+output.name = input.name;
+output.notification = input.notification;
+output.passwordNeedsReset = input.passwordNeedsReset;
+output.phone = input.phone;
+output.photo = input.photo;
+output.preferredLanguage = input.preferredLanguage;
+output.roles = input.roles;
+output.schedule = input.schedule;
+output.source = input.source;
+output.state = input.state;
+output.street = input.street;
+output.sysClassName = input.sysClassName;
+output.sysCreatedBy = input.sysCreatedBy;
+output.sysCreatedOn = input.sysCreatedOn;
+output.sysDomain = input.sysDomain;
+output.sysId = input.sysId;
+output.sysModCount = input.sysModCount;
+output.sysUpdatedBy = input.sysUpdatedBy;
+output.sysUpdatedOn = input.sysUpdatedOn;
+output.timeFormat = input.timeFormat;
+output.timeZone = input.timeZone;
+output.title = input.title;
+output.userName = input.userName;
+output.userPassword = input.userPassword;
+output.vip = input.vip;
+output.webServiceAccessOnly = input.webServiceAccessOnly;
+output.zip = input.zip;
+]]></attr>
+</Node>
+<Node cacheInMemory="true" enabled="enabled" fileURL="dict:outputPayload" guiName="Map&lt;k,v&gt; WRITER" guiX="900" guiY="20" id="MAP_WRITER0" type="MAP_WRITER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<Map xmlns:clover="http://www.cloveretl.com/ns/xmlmapping" clover:inPort="0">
+  <accumulatedRoles>$0.accumulatedRoles</accumulatedRoles>
+  <active>$0.active</active>
+  <building>$0.building</building>
+  <calendarIntegration>$0.calendarIntegration</calendarIntegration>
+  <city>$0.city</city>
+  <company>$0.company</company>
+  <costCenter>$0.costCenter</costCenter>
+  <country>$0.country</country>
+  <dateFormat>$0.dateFormat</dateFormat>
+  <defaultPerspective>$0.defaultPerspective</defaultPerspective>
+  <department>$0.department</department>
+  <email>$0.email</email>
+  <employeeNumber>$0.employeeNumber</employeeNumber>
+  <failedAttempts>$0.failedAttempts</failedAttempts>
+  <firstName>$0.firstName</firstName>
+  <gender>$0.gender</gender>
+  <homePhone>$0.homePhone</homePhone>
+  <internalIntegrationUser>$0.internalIntegrationUser</internalIntegrationUser>
+  <introduction>$0.introduction</introduction>
+  <lastLogin>$0.lastLogin</lastLogin>
+  <lastLoginTime>$0.lastLoginTime</lastLoginTime>
+  <lastName>$0.lastName</lastName>
+  <ldapServer>$0.ldapServer</ldapServer>
+  <location>$0.location</location>
+  <lockedOut>$0.lockedOut</lockedOut>
+  <manager>$0.manager</manager>
+  <middleName>$0.middleName</middleName>
+  <mobilePhone>$0.mobilePhone</mobilePhone>
+  <name>$0.name</name>
+  <notification>$0.notification</notification>
+  <passwordNeedsReset>$0.passwordNeedsReset</passwordNeedsReset>
+  <phone>$0.phone</phone>
+  <photo>$0.photo</photo>
+  <preferredLanguage>$0.preferredLanguage</preferredLanguage>
+  <roles>$0.roles</roles>
+  <schedule>$0.schedule</schedule>
+  <source>$0.source</source>
+  <state>$0.state</state>
+  <street>$0.street</street>
+  <sysClassName>$0.sysClassName</sysClassName>
+  <sysCreatedBy>$0.sysCreatedBy</sysCreatedBy>
+  <sysCreatedOn>$0.sysCreatedOn</sysCreatedOn>
+  <sysDomain>$0.sysDomain</sysDomain>
+  <sysId>$0.sysId</sysId>
+  <sysModCount>$0.sysModCount</sysModCount>
+  <sysUpdatedBy>$0.sysUpdatedBy</sysUpdatedBy>
+  <sysUpdatedOn>$0.sysUpdatedOn</sysUpdatedOn>
+  <timeFormat>$0.timeFormat</timeFormat>
+  <timeZone>$0.timeZone</timeZone>
+  <title>$0.title</title>
+  <userName>$0.userName</userName>
+  <userPassword>$0.userPassword</userPassword>
+  <vip>$0.vip</vip>
+  <webServiceAccessOnly>$0.webServiceAccessOnly</webServiceAccessOnly>
+  <zip>$0.zip</zip>
+</Map>]]></attr>
+<attr name="_data_format"><![CDATA[MAP]]></attr>
+</Node>
+<Edge debugMode="true" fromNode="BEAN_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="6f3df6ed-a458-4f3e-a28c-681653b374fa" outPort="Port 0 (out)" toNode="FOREACH_MAP_MAP:0"/>
+<Edge debugMode="true" fromNode="FOREACH_MAP_MAP:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="4990e87c-d795-49de-a17e-59d137419574" outPort="Port 0 (out)" toNode="MAP_WRITER0:0"/>
+</Phase>
+</Graph>

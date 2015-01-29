@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow" xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/mule/wd-staffing/current/mule-wd-staffing.xsd
+http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
+http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd
+http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd">
+    <wd-staffing:config name="Workday_Staffing" staffingUser="${wday.user}" staffingPassword="${wday.password}" staffingEndpoint="${wday.endpoint}" doc:name="Workday Staffing">
+        <wd-staffing:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
+    </wd-staffing:config>
+    
+    <data-mapper:config name="pojo_to_hireemployeerequesttype" transformationGraphPath="pojo_to_hireemployeerequesttype.grf" doc:name="DataMapper"/>
+    <data-mapper:config name="EmployeeType_To_TerminateEmployeeRequestType" transformationGraphPath="employeetype_to_terminateemployeerequesttype.grf" doc:name="DataMapper"/>
+    
+    <sub-flow name="hireEmployee" doc:name="hireEmployee">
+        <data-mapper:transform config-ref="pojo_to_hireemployeerequesttype" doc:name="Jobvite To HireEmployeeRequestType" />
+        <wd-staffing:hire-employee config-ref="Workday_Staffing" doc:name="Workday Staffing"/>
+                    
+    </sub-flow>
+    <sub-flow name="deleteRequests" doc:name="deleteRequests">
+        <servicenow:delete-multiple config-ref="ServiceNow" type="SC_REQUEST" doc:name="ServiceNow">
+            <servicenow:delete-multiple-request>
+                <servicenow:delete-multiple-request key="sysId">#[payload]</servicenow:delete-multiple-request>
+            </servicenow:delete-multiple-request>
+        </servicenow:delete-multiple>
+    </sub-flow>
+    <sub-flow name="deleteReqItems" doc:name="deleteReqItems">
+        <servicenow:delete-multiple config-ref="ServiceNow" type="SC_REQ_ITEM" doc:name="ServiceNow">
+            <servicenow:delete-multiple-request>
+                <servicenow:delete-multiple-request key="parent">#[payload]</servicenow:delete-multiple-request>
+            </servicenow:delete-multiple-request>
+        </servicenow:delete-multiple>
+    </sub-flow>
+    <sub-flow name="getSnowReqItems" doc:name="getSnowReqItems">
+        <servicenow:get-records config-ref="ServiceNow" type="SC_REQ_ITEM" doc:name="ServiceNow">
+            <servicenow:get-records-request >
+                <servicenow:get-records-request key="parent">#[payload]</servicenow:get-records-request>
+            </servicenow:get-records-request>
+        </servicenow:get-records>
+    </sub-flow>
+    <sub-flow name="getWorkdayEmployee" doc:name="getWorkdayEmployee">
+        <wd-hr:get-employee config-ref="Workday_Human_Resource" doc:name="Workday Human Resource"/>
+    </sub-flow>
+    <sub-flow name="getSnowRequests" doc:name="getSnowRequests">
+        <servicenow:get-records config-ref="ServiceNow" type="SC_REQUEST" doc:name="ServiceNow">
+            <servicenow:get-records-request >
+                <servicenow:get-records-request key="assignedTo">#[payload]</servicenow:get-records-request>
+            </servicenow:get-records-request>
+        </servicenow:get-records>
+    </sub-flow>
+    
+    <sub-flow name="getWorkdaytoTerminateFlow" doc:name="getWorkdaytoTerminateFlow">
+        <wd-hr:get-employee config-ref="Workday_Human_Resource" doc:name="Workday Human Resource"/>
+        <data-mapper:transform doc:name="EmployeeType To TerminateEmployeeRequestType" config-ref="EmployeeType_To_TerminateEmployeeRequestType"/>
+	</sub-flow>
+    
+    <sub-flow name="terminateWorkdayEmployee" doc:name="terminateWorkdayEmployee">
+    	<wd-staffing:terminate-employee config-ref="Workday_Staffing" doc:name="Workday Staffing" />
+    </sub-flow>
+    
+</mule>

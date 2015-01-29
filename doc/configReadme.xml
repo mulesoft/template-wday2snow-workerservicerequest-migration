@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<configuration>
+	<placeholders>
+		<placeholder id="template_name">
+		Workday Worker to ServiceNow Request Broadcast
+		</placeholder>
+	</placeholders>
+	<sections>
+		<section id="use_case">
+			<![CDATA[When a new employee is hired, create 2 service requests
+1. One service request for setting up a desk
+2. one service request for setting up a computer
+
+If the department is sales, make the request for Building A, if the department is anything else make their seat building B.	
+
+The data is processed as follows:
+1. Workday is polled in intervals for new modifications of employees
+2. Employee data is processed to identify new hires
+3. Service request for a computer is sent to ServiceNow
+4. Service request for a desk is sent to ServiceNow		
+			]]>
+		</section>
+		<section id="considerations">
+			<![CDATA[There are no special considerations for this template.]]>
+		</section>
+		<section id="application_configuration">
+			<![CDATA[
++ poll.frequencyMillis `10000`
++ poll.startDelayMillis `500`
++ watermark.default.expression `#[groovy: new Date(System.currentTimeMillis() - 10000)]`
+
+#### WorkDay Connector configuration for company A
++ wday.user `user1@mulesoft_pt1`
++ wday.password `ExamplePassword565`
++ wday.endpoint `https://services1.workday.com/ccx/service/acme/Human_Resources/v20`
+
+#### ServiceNow Connector configuration for company B
++ snow.user `snow_user1`
++ snow.password `ExamplePassword881`
++ snow.endpoint `https://instance.service-now.com`
+
++ snow.pc.assignedTo `1e826bf03710200044e0bfc8bcbe5d9c`
++ snow.desk.assignedTo `1e826bf03710200044e0bfc8bcbe5d9c`
++ snow.desk.model `5c7eb5092ba7a100c173448405da1563`
++ snow.pc.model `e212a942c0a80165008313c59764eea1`
++ snow.locationA `30fffb993790200044e0bfc8bcbe5dcc`
++ snow.locationB `8228cda2ac1d55eb7029baf443945c37`
+
++ snow.pc.deliveryDays `5`
++ snow.pc.price `3000`
+
++ snow.desk.deliveryDays `3`
++ snow.desk.price` 500`
+		  ]]>
+		</section>
+		<section id="api_calls">
+			<![CDATA[There are no special considerations regarding API calls.  ]]>
+		</section>
+		<section id="default_endpoints_xml">
+		<![CDATA[
+This file should contain every inbound endpoint of your integration app. It is intended to contain the application API.
+In this particular template, this file contains a poll inbound endpoints that query Workday for updates using watermark.
+]]>
+		</section>
+		<section id="default_business_logic_xml">
+		<![CDATA[
+This file holds the functional aspect of the template (points 2. to 4. described in the template overview. Its main component is a Batch job, and it includes *steps* for executing the broadcast operation from Workday to ServiceNow.
+]]>
+	</section>
+	</sections>
+</configuration>
