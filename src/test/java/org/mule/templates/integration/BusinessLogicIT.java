@@ -7,6 +7,7 @@
 package org.mule.templates.integration;
 
 import java.io.FileInputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,7 +30,6 @@ import org.junit.Test;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.context.notification.NotificationException;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.templates.utils.Employee;
 
@@ -52,29 +52,33 @@ import com.workday.staffing.TerminateEventDataType;
  */
 public class BusinessLogicIT extends AbstractTemplateTestCase {
 
+	private static final String PHONE_NUMBER = "232-2323";
+	private static final String STREET = "999 Main St";
+	private static final String CITY = "San Francisco";
 	private static String WDAY_EXT_ID;
 	private static final String TEMPLATE_PREFIX = "wday2snow-worker-broadcast";
 	private static final long TIMEOUT_MILLIS = 30000;
 	private static final long DELAY_MILLIS = 500;
 	protected static final String PATH_TO_TEST_PROPERTIES = "./src/test/resources/mule.test.properties";
-	protected static final int TIMEOUT_SEC = 60;
+	protected static final int TIMEOUT_SEC = 60000;
 	private static String PC_MODEL;
+	private static String PC_ASSIGNED_TO;
 	private static String DESK_MODEL;
 	private static String DESK_ASSIGNED_TO;
 	private BatchTestHelper helper;
 	
-    private String EXT_ID, EMAIL = "bwillis@gmailtest.com";
+    private static String EXT_ID;
+	private String EMAIL = "bwillis@gmailtest.com";
 	private Employee employee;
     private List<String> snowReqIds = new ArrayList<String>();
     private static String WDAY_TERMINATION_ID;
+	private Map<String, String> user = new HashMap<String, String>();	
 	
     private static Date startingDate;
     
     @BeforeClass
     public static void beforeTestClass() {
-        System.setProperty("poll.startDelayMillis", "0");
-        System.setProperty("poll.frequencyMillis", "60000");
-        
+    	
         final Properties props = new Properties();
     	try {
     	props.load(new FileInputStream(PATH_TO_TEST_PROPERTIES));
@@ -84,46 +88,43 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     	
     	WDAY_TERMINATION_ID = props.getProperty("wday.termination.id");
     	WDAY_EXT_ID = props.getProperty("wday.ext.id");
-    	DESK_ASSIGNED_TO = props.getProperty("snow.desk.assignedTo");
     	PC_MODEL = props.getProperty("snow.pc.model");
+    	PC_ASSIGNED_TO = props.getProperty("snow.pc.assignedTo");
+    	DESK_ASSIGNED_TO = props.getProperty("snow.desk.assignedTo");
     	DESK_MODEL = props.getProperty("snow.desk.model");
+    	EXT_ID = props.getProperty("wday.ext.id");
     	Calendar cal = Calendar.getInstance();
     	cal.add(Calendar.HOUR_OF_DAY, -2);
     	startingDate = cal.getTime();
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");    	
+    	System.setProperty("migration.startDate", "\"" + sdf.format(new Date()) + "\"");
     }
 
     @Before
     public void setUp() throws Exception {
-    	helper = new BatchTestHelper(muleContext);
-		stopFlowSchedulers(POLL_FLOW_NAME);
-		registerListeners();
-		
+    	helper = new BatchTestHelper(muleContext);		
 		createTestDataInSandBox();
     }
 
     @After
     public void tearDown() throws MuleException, Exception {
     	deleteTestDataFromSandBox();
-    }
+    }    
     
-    private void registerListeners() throws NotificationException {
-		muleContext.registerListener(pipelineListener);
-	}
-    
-    private void createTestDataInSandBox() throws MuleException, Exception {
-		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("hireEmployee");
-		flow.initialise();
-		logger.info("creating a workday employee...");
-		try {
-			flow.process(getTestEvent(prepareNewHire(), MessageExchangePattern.REQUEST_RESPONSE));						
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//    private void createTestDataInSandBox() throws MuleException, Exception {
+//		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("hireEmployee");
+//		flow.initialise();
+//		logger.info("Creating a workday employee...");
+//		try {
+//			flow.process(getTestEvent(prepareNewHire(), MessageExchangePattern.REQUEST_RESPONSE));						
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
     
     private List<Object> prepareNewHire(){
 		EXT_ID = TEMPLATE_PREFIX + System.currentTimeMillis();
-		logger.info("employee name: " + EXT_ID);
+		logger.info("Employee name: " + EXT_ID);
 		employee = new Employee(EXT_ID, "Willis1", EMAIL, "650-232-2323", "999 Main St", "San Francisco", "CA", "94105", "US", "o7aHYfwG", 
 				"2014-04-17-07:00", "2014-04-21-07:00", "QA Engineer", "San_Francisco_site", "Regular", "Full Time", "Salary", "USD", "140000", "Annual", "39905", "21440", EXT_ID);
 		List<Object> list = new ArrayList<Object>();
@@ -133,22 +134,22 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     
 	@Test
     public void testMainFlow() throws Exception {
-		Thread.sleep(10000);
-		runSchedulersOnce(POLL_FLOW_NAME);
-		waitForPollToRun();
-		helper.awaitJobTermination(TIMEOUT_MILLIS, DELAY_MILLIS);
+		Thread.sleep(1000);
+		runFlow("mainFlow");
+		// Wait for the batch job executed by the poll flow to finish
+		helper.awaitJobTermination(TIMEOUT_SEC * 1000, 500);
 		helper.assertJobWasSuccessful();	
 		
 		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("getSnowRequests");
 		flow.initialise();
 		Map<String, String> inputMap = new HashMap<String, String>();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		logger.info("starting date: " + sdf.format(startingDate));
+		logger.info("Starting date: " + sdf.format(startingDate));
 		inputMap.put("assignedTo", DESK_ASSIGNED_TO);
 		
 		MuleEvent response = flow.process(getTestEvent(DESK_ASSIGNED_TO, MessageExchangePattern.REQUEST_RESPONSE));
 		GetRecordsResponse snowRes = ((GetRecordsResponse)response.getMessage().getPayload());
-		logger.info("snow requests: " + snowRes.getGetRecordsResult().size());
+		logger.info("Snow requests: " + snowRes.getGetRecordsResult().size());
 		
 		int count = 0;
 		for (com.servicenow.servicecatalog.screquest.GetRecordsResponse.GetRecordsResult item : snowRes.getGetRecordsResult()){
@@ -156,7 +157,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 				count++;
 				snowReqIds.add(item.getSysId());
 				List<GetRecordsResult> reqItems = getReqItem(item.getSysId());
-				Assert.assertTrue("There should be 1 request item in request in ServiceNow.", reqItems.size() == 1);
+				Assert.assertTrue("There should be 1 request item in request in ServiceNow and there is " + reqItems.size() + ".", reqItems.size() == 1);
 				for (com.servicenow.servicecatalog.screqitem.GetRecordsResponse.GetRecordsResult reqItem  : reqItems){
 					Assert.assertTrue("There should be correct catalogue item set.", 
 							reqItem.getCatItem().equals(PC_MODEL) || reqItem.getCatItem().equals(DESK_MODEL));
@@ -178,7 +179,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     }
     
     private void deleteTestDataFromSandBox() throws MuleException, Exception {
-    	logger.info("deleting test data...");
+    	logger.info("Deleting test data...");
 		
     	SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("deleteRequests");
 		flow.initialise();
@@ -202,7 +203,6 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
-
 	}
     
     private EmployeeGetType getEmployee(){
@@ -242,5 +242,29 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
 	}
 	
+	private void createTestDataInSandBox() throws MuleException, Exception {
+		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("updateWorkdayEmployee");
+		flow.initialise();
+		logger.info("Updating a workday employee...");
+		try {
+			flow.process(getTestEvent(prepareEdit(), MessageExchangePattern.REQUEST_RESPONSE));						
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private Map<String, String> prepareEdit(){			
+		user.put("Location", "San_Francisco_site");
+		user.put("Phone", PHONE_NUMBER);
+		user.put("Email", EMAIL);
+		user.put("ExtId__c", EXT_ID);
+		user.put("Street", STREET + System.currentTimeMillis());
+		user.put("Country", "USA");
+		user.put("State", "USA-CA");
+		user.put("City", CITY);
+		user.put("PostalCode", "94105");
+		user.put("LastModifiedDate", String.valueOf(System.currentTimeMillis()));
+		return user;
+	}
 	
 }

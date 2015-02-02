@@ -4,6 +4,7 @@
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
       version="EE-3.5.2"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
@@ -12,6 +13,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd
 http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
@@ -22,7 +24,7 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
     <batch:job name="createServiceNowAssets">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
         <batch:input>
-            <wd-hr:get-workers config-ref="Workday_Human_Resource"  doc:name="Workday Human Resource" workersRequest-ref="#[org.mule.templates.WorkersRequest.create(${migration.startDate})]"/>
+            <wd-hr:get-workers config-ref="Workday_Human_Resource"  doc:name="Workday Human Resource - Get workers" workersRequest-ref="#[org.mule.templates.WorkersRequest.create(${migration.startDate})]"/>
 
             <set-payload value="#[payload.responseData.worker]" doc:name="Extract a list of Workers"/>
             <custom-filter doc:name="Filter duplicate workers" class="org.mule.templates.WorkersDeduplicationFilter"/>
@@ -36,57 +38,7 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
 <!--                     <component class="org.mule.templates.DepartmentProcessor" doc:name="Check for sales organization"/> -->
 <!--                 </enricher> -->
 <!--             </batch:step> -->
-            
-            <batch:step name="getUserInSnowStep">
-                <enricher source="#[payload]" target="#[recordVars['userInSnow']]" doc:name="store result in record var 'userInSnow'">
-                    <choice doc:name="Choice">
-                        <when expression="#[payload.workerData.userAccountData == null]">
-                            <servicenow:get-records config-ref="ServiceNow" type="SYS_USER" doc:name="query user in ServiceNow by email and name">
-                                <servicenow:get-records-request>
-                                    <servicenow:get-records-request key="lastName">#[payload.workerData.getPersonalData().getNameData().getPreferredNameData().getNameDetailData().getLastName()]</servicenow:get-records-request>
-                                    <servicenow:get-records-request key="email">#[payload.workerData.getPersonalData().getContactData().getEmailAddressData().get(0).getEmailAddress()]</servicenow:get-records-request>
-                                    <servicenow:get-records-request key="firstName">#[payload.workerData.getPersonalData().getNameData().getPreferredNameData().getNameDetailData().getFirstName()]</servicenow:get-records-request>
-                                </servicenow:get-records-request>
-                            </servicenow:get-records>
-                        </when>
-                        <when expression="#[payload.workerData.userAccountData != null &amp;&amp; payload.workerData.userAccountData.userName != null]">
-                            <servicenow:get-records config-ref="ServiceNow" type="SYS_USER" doc:name="query user in ServiceNow by username">
-                                <servicenow:get-records-request>
-                                    <servicenow:get-records-request key="userName">#[payload.workerData.userAccountData.userName]</servicenow:get-records-request>
-                                </servicenow:get-records-request>
-                            </servicenow:get-records>
-                        </when>
-                        <otherwise>
-                            <set-payload value="#[return null]" doc:name="Set Payload"/>
-                        </otherwise>
-                    </choice>
-                </enricher>
 
- 
-            </batch:step>
-            <batch:step name="mapWorkdayWorkerToSnowMap">
-                <data-mapper:transform config-ref="Pojo_To_Map" doc:name="Pojo To Map"/>
-
-
-            </batch:step>
-
-            <batch:step name="defineIdInServiceNowStep" filter-expression="#[recordVars['userInSnow'] is NullPayload]">
-                <expression-component doc:name="define Id in Service Now instance"><![CDATA[ payload.put('sysId', recordVars['userInSnow'].getGetRecordsResult().isEmpty() ? null : recordVars['userInSnow'].getGetRecordsResult().get(0).getSysId());]]></expression-component>
-
-            </batch:step>
-
-            <batch:step name="createUsersInServiceNowStep" accept-expression="!(payload instanceof NullPayload) &amp;&amp; payload['sysId'] == null">
- 
-                <logger message="User to create: #[payload]" level="INFO" doc:name="Log user to create"/>
-                <expression-component doc:name="Expression"><![CDATA[payload.remove('username');]]></expression-component>
-                <enricher source="#[payload]" target="#[recordVars['userInSnow']]" doc:name="Message Enricher">
-                    <servicenow:insert config-ref="ServiceNow" type="SYS_USER" doc:name="ServiceNow">
-                        <servicenow:insert-request ref="#[payload]"/>
-                    </servicenow:insert>
-                </enricher>
-
-
-            </batch:step>
 <!--             <batch:step name="updateUsersInServiceNowStep" accept-expression="!(payload instanceof NullPayload) &amp;&amp; payload['sysId'] != null &amp;&amp; payload['email'] != null"> -->
 <!--                 <logger message="User to update: #[payload]" level="INFO" doc:name="Log user to update"/> -->
 <!--                 <servicenow:update config-ref="ServiceNow" type="SYS_USER" doc:name="ServiceNow"> -->
@@ -106,15 +58,21 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
 
         </batch:process-records>
         <batch:on-complete>
-            <json:object-to-json-transformer doc:name="Convert Batch results to JSON"/>
-            <logger level="INFO" doc:name="Log the batch result" message="Batch completed: #[payload]"/>
+            <json:object-to-json-transformer doc:name="transform BatchJobInstance to JSON"/>
+<!--             <json:object-to-json-transformer doc:name="Convert Batch results to JSON"/> -->
+<!--             <logger level="INFO" doc:name="Log the batch result" message="Batch completed: #[payload]"/> -->
+<scatter-gather doc:name="All">
+                <logger message="Migration process has finished: #[payload]" level="INFO" doc:name="log 'Migration process has finished'"/>
+                <smtp:outbound-endpoint host="${smtp.host}" responseTimeout="10000" doc:name="SMTP" connector-ref="gmailConnector" from="${mail.from}" password="${smtp.password}" port="${smtp.port}" subject="${mail.subject}" to="${mail.to}" user="${smtp.user}"/>
+
+            </scatter-gather>
         </batch:on-complete>
     </batch:job>
     <sub-flow name="insertPcRequest" doc:name="insertPcRequest">
         <expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['approval'] = "Requested";
 output['active'] = true;
-output['assignedTo'] = recordVars['userInSnow'].getRecordsResult[0].sysId; // '${snow.pc.assignedTo}';
+output['assignedTo'] = '${snow.pc.assignedTo}';
 output['location'] = '${snow.locationA}';
 output['price'] = new BigDecimal('${snow.pc.price}');
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
@@ -127,6 +85,7 @@ payload = output;]]></expression-component>
 output['active'] = true;
 output['approval'] = "requested";
 output['catItem'] = '${snow.pc.model}';
+output['approvalSet'] = '${snow.pc.assignedTo}';
 output['request'] = recordVars['request1']['sysId'];
 output['parent'] = recordVars['request1']['sysId'];
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
@@ -152,7 +111,7 @@ payload = output;]]></expression-component>
 output['active'] = true;
 output['approval'] = "requested";
 output['catItem'] = '${snow.desk.model}';
-output['approvalSet'] = recordVars['userInSnow'].getRecordsResult[0].sysId;
+output['approvalSet'] = '${snow.desk.assignedTo}';
 output['request'] = recordVars['request2']['sysId'];
 output['parent'] = recordVars['request2']['sysId'];
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
