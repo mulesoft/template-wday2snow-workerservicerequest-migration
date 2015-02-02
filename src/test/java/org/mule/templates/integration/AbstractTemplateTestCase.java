@@ -19,7 +19,6 @@ import org.mule.tck.junit4.rule.DynamicPort;
 /**
  * This is the base test class for Anypoint Templates integration tests.
  * 
- * @author marek.pataky
  */
 public class AbstractTemplateTestCase extends FunctionalTestCase {
 	private static final String MAPPINGS_FOLDER_PATH = "./mappings";
@@ -39,8 +38,7 @@ public class AbstractTemplateTestCase extends FunctionalTestCase {
 		} catch (Exception e) {
 			throw new IllegalStateException(
 					"Could not find mule-deploy.properties file on classpath. Please add any of those files or override the getConfigResources() method to provide the resources by your own.");
-		}
-	
+		}	
 		return resources + getTestFlows();
 	}
 

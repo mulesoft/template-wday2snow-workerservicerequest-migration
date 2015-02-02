@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
-      xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
-      version="EE-3.5.2"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+<mule xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow"
+	xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+	version="EE-3.5.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd
@@ -18,58 +20,48 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
 http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd">
-    <data-mapper:config name="Pojo_To_Map" transformationGraphPath="pojo_to_map.grf" doc:name="Pojo_To_Map"/>
+	<data-mapper:config name="Pojo_To_Map"
+		transformationGraphPath="pojo_to_map.grf" doc:name="Pojo_To_Map" />
 
-    
-    <batch:job name="createServiceNowAssets">
-        <batch:threading-profile poolExhaustedAction="WAIT"/>
-        <batch:input>
-            <wd-hr:get-workers config-ref="Workday_Human_Resource"  doc:name="Workday Human Resource - Get workers" workersRequest-ref="#[org.mule.templates.WorkersRequest.create(${migration.startDate})]"/>
+	<batch:job name="createServiceNowAssets">
+		<batch:threading-profile poolExhaustedAction="WAIT" />
+		<batch:input>
+			<wd-hr:get-workers config-ref="Workday_Human_Resource"
+				doc:name="Workday Human Resource - Get workers"
+				workersRequest-ref="#[org.mule.templates.WorkersRequest.create(${migration.startDate})]" />
+			<set-payload value="#[payload.responseData.worker]"
+				doc:name="Extract a list of Workers" />
+			<custom-filter doc:name="Filter duplicate workers"
+				class="org.mule.templates.WorkersDeduplicationFilter" />
+		</batch:input>
+		<batch:process-records>
 
-            <set-payload value="#[payload.responseData.worker]" doc:name="Extract a list of Workers"/>
-            <custom-filter doc:name="Filter duplicate workers" class="org.mule.templates.WorkersDeduplicationFilter"/>
-        </batch:input>
-        <batch:process-records>
-<!--             <batch:step name="CheckIfNewHire" > -->
-<!--                 <enricher source="payload" target="recordVars['isNewHire']" doc:name="store in recordVars['isNewHire']"> -->
-<!--                     <component class="org.mule.templates.TransactionsProcessor" doc:name="Iterate through transaction logs"/> -->
-<!--                 </enricher> -->
-<!--                 <enricher source="payload" target="recordVars['isSales']" doc:name="store in recordVars['isSales']"> -->
-<!--                     <component class="org.mule.templates.DepartmentProcessor" doc:name="Check for sales organization"/> -->
-<!--                 </enricher> -->
-<!--             </batch:step> -->
+			<batch:step name="InsertPcRequest">
+				<flow-ref name="insertPcRequest" doc:name="Flow Reference" />
 
-<!--             <batch:step name="updateUsersInServiceNowStep" accept-expression="!(payload instanceof NullPayload) &amp;&amp; payload['sysId'] != null &amp;&amp; payload['email'] != null"> -->
-<!--                 <logger message="User to update: #[payload]" level="INFO" doc:name="Log user to update"/> -->
-<!--                 <servicenow:update config-ref="ServiceNow" type="SYS_USER" doc:name="ServiceNow"> -->
-<!--                     <servicenow:update-request ref="#[payload]"/> -->
-<!--                 </servicenow:update> -->
-<!--             </batch:step> -->
-            
-            <batch:step name="InsertPcRequest" >
-                <flow-ref name="insertPcRequest" doc:name="Flow Reference"/>
+			</batch:step>
 
-            </batch:step>
+			<batch:step name="InsertDeskRequest">
+				<flow-ref name="insertDeskRequest" doc:name="Flow Reference" />
 
-            <batch:step name="InsertDeskRequest" >
-                <flow-ref name="insertDeskRequest" doc:name="Flow Reference"/>
+			</batch:step>
 
-            </batch:step>
-
-        </batch:process-records>
-        <batch:on-complete>
-            <json:object-to-json-transformer doc:name="transform BatchJobInstance to JSON"/>
-<!--             <json:object-to-json-transformer doc:name="Convert Batch results to JSON"/> -->
-<!--             <logger level="INFO" doc:name="Log the batch result" message="Batch completed: #[payload]"/> -->
-<scatter-gather doc:name="All">
-                <logger message="Migration process has finished: #[payload]" level="INFO" doc:name="log 'Migration process has finished'"/>
-                <smtp:outbound-endpoint host="${smtp.host}" responseTimeout="10000" doc:name="SMTP" connector-ref="gmailConnector" from="${mail.from}" password="${smtp.password}" port="${smtp.port}" subject="${mail.subject}" to="${mail.to}" user="${smtp.user}"/>
-
-            </scatter-gather>
-        </batch:on-complete>
-    </batch:job>
-    <sub-flow name="insertPcRequest" doc:name="insertPcRequest">
-        <expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
+		</batch:process-records>
+		<batch:on-complete>
+			<json:object-to-json-transformer
+				doc:name="transform BatchJobInstance to JSON" />
+			<scatter-gather doc:name="All">
+				<logger message="Migration process has finished: #[payload]"
+					level="INFO" doc:name="log 'Migration process has finished'" />
+				<smtp:outbound-endpoint host="${smtp.host}"
+					responseTimeout="10000" doc:name="SMTP" connector-ref="gmailConnector"
+					from="${mail.from}" password="${smtp.password}" port="${smtp.port}"
+					subject="${mail.subject}" to="${mail.to}" user="${smtp.user}" />
+			</scatter-gather>
+		</batch:on-complete>
+	</batch:job>
+	<sub-flow name="insertPcRequest" doc:name="insertPcRequest">
+		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['approval'] = "Requested";
 output['active'] = true;
 output['assignedTo'] = '${snow.pc.assignedTo}';
@@ -78,10 +70,11 @@ output['price'] = new BigDecimal('${snow.pc.price}');
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
 output['dueDate'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.pc.deliveryDays}) * 86400000));
 payload = output;]]></expression-component>
-        <enricher source="payload" target="recordVars['request1']" doc:name="store in recordVars['request1']">
-            <flow-ref name="insertRequestFlow" doc:name="call insertRequestFlow"/>
-        </enricher>
-        <expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
+		<enricher source="payload" target="recordVars['request1']"
+			doc:name="store in recordVars['request1']">
+			<flow-ref name="insertRequestFlow" doc:name="call insertRequestFlow" />
+		</enricher>
+		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['active'] = true;
 output['approval'] = "requested";
 output['catItem'] = '${snow.pc.model}';
@@ -92,10 +85,10 @@ java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");
 output['estimatedDelivery'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.pc.deliveryDays}) * 86400000));
 output['price'] = ${snow.pc.price};
 payload = output;]]></expression-component>
-        <flow-ref name="insertItemFlow" doc:name="call insertItemFlow"/>
-    </sub-flow>
-    <sub-flow name="insertDeskRequest" doc:name="insertDeskRequest">
-        <expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
+		<flow-ref name="insertItemFlow" doc:name="call insertItemFlow" />
+	</sub-flow>
+	<sub-flow name="insertDeskRequest" doc:name="insertDeskRequest">
+		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['approval'] = "Requested";
 output['active'] = true;
 output['assignedTo'] = '${snow.desk.assignedTo}';
@@ -104,10 +97,11 @@ output['price'] = new BigDecimal('${snow.desk.price}');
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
 output['dueDate'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.desk.deliveryDays}) * 86400000));
 payload = output;]]></expression-component>
-        <enricher source="payload" target="recordVars['request2']" doc:name="store in recordVars['request1']">
-            <flow-ref name="insertRequestFlow" doc:name="call insertRequestFlow"/>
-        </enricher>
-        <expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
+		<enricher source="payload" target="recordVars['request2']"
+			doc:name="store in recordVars['request1']">
+			<flow-ref name="insertRequestFlow" doc:name="call insertRequestFlow" />
+		</enricher>
+		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['active'] = true;
 output['approval'] = "requested";
 output['catItem'] = '${snow.desk.model}';
@@ -118,19 +112,24 @@ java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");
 output['estimatedDelivery'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.desk.deliveryDays}) * 86400000));
 output['price'] = ${snow.desk.price};
 payload = output;]]></expression-component>
-        <flow-ref name="insertItemFlow" doc:name="call insertItemFlow"/>
-    </sub-flow>
+		<flow-ref name="insertItemFlow" doc:name="call insertItemFlow" />
+	</sub-flow>
 
-    <sub-flow name="insertRequestFlow" doc:name="insertRequestFlow">
-        <servicenow:insert config-ref="ServiceNow" type="SC_REQUEST" doc:name="ServiceNow">
-            <servicenow:insert-request ref="#[payload]"/>
-        </servicenow:insert>
-        <logger message="request: #[payload]" level="INFO" doc:name="Log the insert response"/>
-    </sub-flow>
-    <sub-flow name="insertItemFlow" doc:name="insertItemFlow">
-        <servicenow:insert config-ref="ServiceNow" type="SC_REQ_ITEM" doc:name="ServiceNow"/>
-        <json:object-to-json-transformer doc:name="Convert InsertResponse to JSON"/>
-        <logger message="request item: #[payload]" level="INFO" doc:name="Log the insert respone"/>
-    </sub-flow>
+	<sub-flow name="insertRequestFlow" doc:name="insertRequestFlow">
+		<servicenow:insert config-ref="ServiceNow" type="SC_REQUEST"
+			doc:name="ServiceNow">
+			<servicenow:insert-request ref="#[payload]" />
+		</servicenow:insert>
+		<logger message="request: #[payload]" level="INFO"
+			doc:name="Log the insert response" />
+	</sub-flow>
+	<sub-flow name="insertItemFlow" doc:name="insertItemFlow">
+		<servicenow:insert config-ref="ServiceNow" type="SC_REQ_ITEM"
+			doc:name="ServiceNow" />
+		<json:object-to-json-transformer
+			doc:name="Convert InsertResponse to JSON" />
+		<logger message="request item: #[payload]" level="INFO"
+			doc:name="Log the insert respone" />
+	</sub-flow>
 
 </mule>

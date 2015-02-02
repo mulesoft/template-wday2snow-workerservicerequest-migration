@@ -44,16 +44,17 @@ http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mu
             </servicenow:get-records-request>
         </servicenow:get-records>
     </sub-flow>
-    <sub-flow name="getWorkdayEmployee" doc:name="getWorkdayEmployee">
-        <wd-hr:get-employee config-ref="Workday_Human_Resource" doc:name="Workday Human Resource"/>
-    </sub-flow>
     <sub-flow name="getSnowRequests" doc:name="getSnowRequests">
         <servicenow:get-records config-ref="ServiceNow" type="SC_REQUEST" doc:name="ServiceNow">
-            <servicenow:get-records-request >
+            <servicenow:get-records-request>
                 <servicenow:get-records-request key="assignedTo">#[payload]</servicenow:get-records-request>
             </servicenow:get-records-request>
         </servicenow:get-records>
     </sub-flow>
+    <sub-flow name="getWorkdayEmployee" doc:name="getWorkdayEmployee">
+        <wd-hr:get-employee config-ref="Workday_Human_Resource" doc:name="Workday Human Resource"/>
+    </sub-flow>
+
     
     <sub-flow name="getWorkdaytoTerminateFlow" doc:name="getWorkdaytoTerminateFlow">
         <wd-hr:get-employee config-ref="Workday_Human_Resource" doc:name="Workday Human Resource"/>
@@ -62,11 +63,7 @@ http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mu
     
     <sub-flow name="terminateWorkdayEmployee" doc:name="terminateWorkdayEmployee">
     	<wd-staffing:terminate-employee config-ref="Workday_Staffing" doc:name="Workday Staffing" />
-    </sub-flow>    
-    
-    <sub-flow name="updateWorkdayEmployee" doc:name="updateWorkdayEmployee">
-        <data-mapper:transform doc:name="DataMapper" config-ref="User_To_Contact"/>
-        <wd-hr:maintain-contact-information config-ref="Workday_Human_Resource" doc:name="Workday Human Resource"/>
     </sub-flow>
+
     
 </mule>

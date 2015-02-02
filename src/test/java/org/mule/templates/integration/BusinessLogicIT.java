@@ -52,15 +52,10 @@ import com.workday.staffing.TerminateEventDataType;
  */
 public class BusinessLogicIT extends AbstractTemplateTestCase {
 
-	private static final String PHONE_NUMBER = "232-2323";
-	private static final String STREET = "999 Main St";
-	private static final String CITY = "San Francisco";
 	private static String WDAY_EXT_ID;
 	private static final String TEMPLATE_PREFIX = "wday2snow-worker-broadcast";
-	private static final long TIMEOUT_MILLIS = 30000;
-	private static final long DELAY_MILLIS = 500;
 	protected static final String PATH_TO_TEST_PROPERTIES = "./src/test/resources/mule.test.properties";
-	protected static final int TIMEOUT_SEC = 60000;
+	protected static final int TIMEOUT_MILLIS = 60000;
 	private static String PC_MODEL;
 	private static String PC_ASSIGNED_TO;
 	private static String DESK_MODEL;
@@ -68,7 +63,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 	private BatchTestHelper helper;
 	
     private static String EXT_ID;
-	private String EMAIL = "bwillis@gmailtest.com";
+	private final String EMAIL = "bwillis@gmailtest.com";
 	private Employee employee;
     private List<String> snowReqIds = new ArrayList<String>();
     private static String WDAY_TERMINATION_ID;
@@ -111,16 +106,16 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     	deleteTestDataFromSandBox();
     }    
     
-//    private void createTestDataInSandBox() throws MuleException, Exception {
-//		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("hireEmployee");
-//		flow.initialise();
-//		logger.info("Creating a workday employee...");
-//		try {
-//			flow.process(getTestEvent(prepareNewHire(), MessageExchangePattern.REQUEST_RESPONSE));						
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+    private void createTestDataInSandBox() throws MuleException, Exception {
+		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("hireEmployee");
+		flow.initialise();
+		logger.info("Creating a workday employee...");
+		try {
+			flow.process(getTestEvent(prepareNewHire(), MessageExchangePattern.REQUEST_RESPONSE));						
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
     
     private List<Object> prepareNewHire(){
 		EXT_ID = TEMPLATE_PREFIX + System.currentTimeMillis();
@@ -137,7 +132,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		Thread.sleep(1000);
 		runFlow("mainFlow");
 		// Wait for the batch job executed by the poll flow to finish
-		helper.awaitJobTermination(TIMEOUT_SEC * 1000, 500);
+		helper.awaitJobTermination(TIMEOUT_MILLIS * 1000, 500);
 		helper.assertJobWasSuccessful();	
 		
 		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("getSnowRequests");
@@ -240,31 +235,5 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		GregorianCalendar gregorianCalendar = (GregorianCalendar) GregorianCalendar.getInstance();
 		gregorianCalendar.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
-	}
-	
-	private void createTestDataInSandBox() throws MuleException, Exception {
-		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("updateWorkdayEmployee");
-		flow.initialise();
-		logger.info("Updating a workday employee...");
-		try {
-			flow.process(getTestEvent(prepareEdit(), MessageExchangePattern.REQUEST_RESPONSE));						
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private Map<String, String> prepareEdit(){			
-		user.put("Location", "San_Francisco_site");
-		user.put("Phone", PHONE_NUMBER);
-		user.put("Email", EMAIL);
-		user.put("ExtId__c", EXT_ID);
-		user.put("Street", STREET + System.currentTimeMillis());
-		user.put("Country", "USA");
-		user.put("State", "USA-CA");
-		user.put("City", CITY);
-		user.put("PostalCode", "94105");
-		user.put("LastModifiedDate", String.valueOf(System.currentTimeMillis()));
-		return user;
-	}
-	
+	}	
 }
