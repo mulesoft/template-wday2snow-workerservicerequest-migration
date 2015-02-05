@@ -42,12 +42,12 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
 		</batch:input>
 		<batch:process-records>
 
-			<batch:step name="InsertPcRequest">
+			<batch:step name="insertPcRequest">
 				<flow-ref name="insertPcRequest" doc:name="Flow Reference" />
 
 			</batch:step>
 
-			<batch:step name="InsertDeskRequest">
+			<batch:step name="insertDeskRequest">
 				<flow-ref name="insertDeskRequest" doc:name="Flow Reference" />
 
 			</batch:step>
@@ -55,10 +55,10 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
 		</batch:process-records>
 		<batch:on-complete>
 			<json:object-to-json-transformer
-				doc:name="transform BatchJobInstance to JSON" />
+				doc:name="Transform BatchJobInstance to JSON" />
 			<scatter-gather doc:name="All">
 				<logger message="Migration process has finished: #[payload]"
-					level="INFO" doc:name="log 'Migration process has finished'" />
+					level="INFO" doc:name="Log 'Migration process has finished'" />
 				<smtp:outbound-endpoint host="${smtp.host}"
 					responseTimeout="10000" doc:name="SMTP" connector-ref="gmailConnector"
 					from="${mail.from}" password="${smtp.password}" port="${smtp.port}"
@@ -78,7 +78,7 @@ output['dueDate'] = df.format(new java.util.Date(System.currentTimeMillis() + ne
 payload = output;]]></expression-component>
 		<enricher source="payload" target="recordVars['request1']"
 			doc:name="store in recordVars['request1']">
-			<flow-ref name="insertRequestFlow" doc:name="call insertRequestFlow" />
+			<flow-ref name="insertRequestFlow" doc:name="Call insertRequestFlow" />
 		</enricher>
 		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['active'] = true;
@@ -91,7 +91,7 @@ java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");
 output['estimatedDelivery'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.pc.deliveryDays}) * 86400000));
 output['price'] = ${snow.pc.price};
 payload = output;]]></expression-component>
-		<flow-ref name="insertItemFlow" doc:name="call insertItemFlow" />
+		<flow-ref name="insertItemFlow" doc:name="Call insertItemFlow" />
 	</sub-flow>
 	<sub-flow name="insertDeskRequest" doc:name="insertDeskRequest">
 		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
@@ -105,7 +105,7 @@ output['dueDate'] = df.format(new java.util.Date(System.currentTimeMillis() + ne
 payload = output;]]></expression-component>
 		<enricher source="payload" target="recordVars['request2']"
 			doc:name="store in recordVars['request1']">
-			<flow-ref name="insertRequestFlow" doc:name="call insertRequestFlow" />
+			<flow-ref name="insertRequestFlow" doc:name="Call insertRequestFlow" />
 		</enricher>
 		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['active'] = true;
@@ -118,7 +118,7 @@ java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");
 output['estimatedDelivery'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.desk.deliveryDays}) * 86400000));
 output['price'] = ${snow.desk.price};
 payload = output;]]></expression-component>
-		<flow-ref name="insertItemFlow" doc:name="call insertItemFlow" />
+		<flow-ref name="insertItemFlow" doc:name="Call insertItemFlow" />
 	</sub-flow>
 
 	<sub-flow name="insertRequestFlow" doc:name="insertRequestFlow">

@@ -86,7 +86,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     	DESK_MODEL = props.getProperty("snow.desk.model");
     	EXT_ID = props.getProperty("wday.ext.id");
     	Calendar cal = Calendar.getInstance();
-    	cal.add(Calendar.HOUR_OF_DAY, -2);
+    	cal.add(Calendar.HOUR_OF_DAY, -1);
     	startingDate = cal.getTime();
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");    	
     	System.setProperty("migration.startDate", "\"" + sdf.format(new Date()) + "\"");
@@ -94,7 +94,8 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 
     @Before
     public void setUp() throws Exception {
-    	helper = new BatchTestHelper(muleContext);		
+    	helper = new BatchTestHelper(muleContext);	
+    	logger.info("Starting date is set to: " + startingDate);
 		createTestDataInSandBox();
     }
 
@@ -126,7 +127,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     
 	@Test
     public void testMainFlow() throws Exception {
-		Thread.sleep(1000);
+		Thread.sleep(10000);
 		runFlow("mainFlow");
 		// Wait for the batch job executed by the poll flow to finish
 		helper.awaitJobTermination(TIMEOUT_MILLIS * 1000, 500);
@@ -137,7 +138,9 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		Map<String, String> inputMap = new HashMap<String, String>();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		logger.info("Starting date: " + sdf.format(startingDate));
-		inputMap.put("assignedTo", ">" + DateUtil.applyTimeZone(startingDate, "yyyy-MM-dd HH:mm:ss", "GMT"));		
+		inputMap.put("sysUpdatedOn", ">" + DateUtil.applyTimeZone(startingDate, "yyyy-MM-dd HH:mm:ss", "GMT"));		
+ //       inputMap.put("assignedTo", ">" + DateUtil.applyTimeZone(startingDate, "yyyy-MM-dd HH:mm:ss", "GMT"));        
+
 		
 		MuleEvent response = flow.process(getTestEvent(ASSIGNED_TO, MessageExchangePattern.REQUEST_RESPONSE));
 		GetRecordsResponse snowRes = ((GetRecordsResponse)response.getMessage().getPayload());

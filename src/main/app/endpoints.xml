@@ -25,8 +25,8 @@ Here you should:
 Here you should not: 
 	* Run validations against external systems
 	* Choose flow of your application based on input parameters">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${http.port}" path="migrateworkers" doc:name="start Workers synchronization"/>
-        <flow-ref name="mainFlow" doc:name="call mainFlow"/>
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${http.port}" path="migrateworkers" doc:name="Start Workers synchronization"/>
+        <flow-ref name="mainFlow" doc:name="Call mainFlow"/>
         <set-payload value="&lt;h1&gt;Batch Process initiated&lt;/h1&gt;&lt;b&gt;ID:&lt;/b&gt;#[payload.getId()]&lt;br/&gt;&lt;b&gt;Records to Be Processed: &lt;/b&gt;#[payload.getRecordCount()]&lt;br/&gt; &lt;b&gt;Start execution on: &lt;/b&gt;#[new java.util.Date()]" doc:name="Set Batch Status response Payload"/>
         <http:response-builder status="200" contentType="text/html" doc:name="Build HTTP Response Message"/>
     </flow>

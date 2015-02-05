@@ -77,7 +77,10 @@ public class WorkersDeduplicationFilter implements Filter {
 		}
 
 		LOGGER.info("Unique emails:" + emails.size());
-		LOGGER.info("Unique workers:" + payload.size());
+		LOGGER.info("List of workers:");
+		for (WorkerType workerType: payload) {
+			LOGGER.info(workerType.getWorkerData().getPersonalData().getNameData().getPreferredNameData().getNameDetailData().getFormattedName());
+		}
 		return true;
 	}
 }
