@@ -29,26 +29,25 @@ public class WorkersRequest {
 	public static GetWorkersRequestType create(String startDate)
 			throws ParseException, DatatypeConfigurationException {
 
-		GetWorkersRequestType getWorkersType = new GetWorkersRequestType();
+		final GetWorkersRequestType getWorkersType = new GetWorkersRequestType();
 
-		EffectiveAndUpdatedDateTimeDataType dateRangeData = new EffectiveAndUpdatedDateTimeDataType();
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, -3);
+		final EffectiveAndUpdatedDateTimeDataType dateRangeData = new EffectiveAndUpdatedDateTimeDataType();
+		final Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.SECOND, -2);
 		dateRangeData.setUpdatedThrough(xmlDate(cal.getTime()));
-		SimpleDateFormat sdf = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		dateRangeData.setUpdatedFrom(xmlDate(sdf.parse(startDate)));
 
-		WorkerRequestCriteriaType crit = new WorkerRequestCriteriaType();
-		List<TransactionLogCriteriaType> transactionLogCriteriaData = new ArrayList<TransactionLogCriteriaType>();
-		TransactionLogCriteriaType log = new TransactionLogCriteriaType();
+		final WorkerRequestCriteriaType crit = new WorkerRequestCriteriaType();
+		final List<TransactionLogCriteriaType> transactionLogCriteriaData = new ArrayList<TransactionLogCriteriaType>();
+		final TransactionLogCriteriaType log = new TransactionLogCriteriaType();
 		log.setTransactionDateRangeData(dateRangeData);
 
 		transactionLogCriteriaData.add(log);
 		crit.setTransactionLogCriteriaData(transactionLogCriteriaData);
 		getWorkersType.setRequestCriteria(crit);
 
-		WorkerResponseGroupType resGroup = new WorkerResponseGroupType();
+		final WorkerResponseGroupType resGroup = new WorkerResponseGroupType();
 		resGroup.setIncludeRoles(true);
 		resGroup.setIncludePersonalInformation(true);
 		resGroup.setIncludeOrganizations(true);
@@ -63,13 +62,9 @@ public class WorkersRequest {
 		return getWorkersType;
 	}
 
-	private static XMLGregorianCalendar xmlDate(Date date)
-			throws DatatypeConfigurationException {
-		GregorianCalendar gregorianCalendar = (GregorianCalendar) GregorianCalendar
-				.getInstance();
+	private static XMLGregorianCalendar xmlDate(Date date) throws DatatypeConfigurationException {
+		final GregorianCalendar gregorianCalendar = (GregorianCalendar) GregorianCalendar.getInstance();
 		gregorianCalendar.setTime(date);
-		return DatatypeFactory.newInstance().newXMLGregorianCalendar(
-				gregorianCalendar);
+		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
 	}
-
 }

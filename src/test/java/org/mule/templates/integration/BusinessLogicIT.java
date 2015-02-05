@@ -7,7 +7,6 @@
 package org.mule.templates.integration;
 
 import java.io.FileInputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,6 +30,7 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
+import org.mule.templates.utils.DateUtil;
 import org.mule.templates.utils.Employee;
 
 import com.mulesoft.module.batch.BatchTestHelper;
@@ -51,25 +51,23 @@ import com.workday.staffing.TerminateEventDataType;
  * for this Anypoint Template that make calls to external systems.
  */
 public class BusinessLogicIT extends AbstractTemplateTestCase {
-
-	private static String WDAY_EXT_ID;
-	private static final String TEMPLATE_PREFIX = "wday2snow-worker-broadcast";
+	
+	private static final String TEMPLATE_PREFIX = "wday2snow-workerservicerequest-migration";
 	protected static final String PATH_TO_TEST_PROPERTIES = "./src/test/resources/mule.test.properties";
-	protected static final int TIMEOUT_MILLIS = 60000;
-	private static String PC_MODEL;
-	private static String PC_ASSIGNED_TO;
-	private static String DESK_MODEL;
-	private static String DESK_ASSIGNED_TO;
-	private BatchTestHelper helper;
-	
-    private static String EXT_ID;
+	protected static final int TIMEOUT_MILLIS = 600;
 	private final String EMAIL = "bwillis@gmailtest.com";
-	private Employee employee;
-    private List<String> snowReqIds = new ArrayList<String>();
-    private static String WDAY_TERMINATION_ID;
-	private Map<String, String> user = new HashMap<String, String>();	
 	
+	private static String PC_MODEL;
+	private static String DESK_MODEL;
+	private static String ASSIGNED_TO;	
+    private static String EXT_ID;
+    private static String WDAY_EXT_ID;
+    private static String WDAY_TERMINATION_ID;	
     private static Date startingDate;
+
+	private BatchTestHelper helper;
+	private Employee employee;
+    private List<String> snowReqIds = new ArrayList<String>();	
     
     @BeforeClass
     public static void beforeTestClass() {
@@ -84,8 +82,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     	WDAY_TERMINATION_ID = props.getProperty("wday.termination.id");
     	WDAY_EXT_ID = props.getProperty("wday.ext.id");
     	PC_MODEL = props.getProperty("snow.pc.model");
-    	PC_ASSIGNED_TO = props.getProperty("snow.pc.assignedTo");
-    	DESK_ASSIGNED_TO = props.getProperty("snow.desk.assignedTo");
+    	ASSIGNED_TO = props.getProperty("snow.desk.assignedTo");
     	DESK_MODEL = props.getProperty("snow.desk.model");
     	EXT_ID = props.getProperty("wday.ext.id");
     	Calendar cal = Calendar.getInstance();
@@ -140,9 +137,9 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		Map<String, String> inputMap = new HashMap<String, String>();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		logger.info("Starting date: " + sdf.format(startingDate));
-		inputMap.put("assignedTo", DESK_ASSIGNED_TO);
+		inputMap.put("assignedTo", ">" + DateUtil.applyTimeZone(startingDate, "yyyy-MM-dd HH:mm:ss", "GMT"));		
 		
-		MuleEvent response = flow.process(getTestEvent(DESK_ASSIGNED_TO, MessageExchangePattern.REQUEST_RESPONSE));
+		MuleEvent response = flow.process(getTestEvent(ASSIGNED_TO, MessageExchangePattern.REQUEST_RESPONSE));
 		GetRecordsResponse snowRes = ((GetRecordsResponse)response.getMessage().getPayload());
 		logger.info("Snow requests: " + snowRes.getGetRecordsResult().size());
 		
@@ -160,8 +157,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 			}
 		}
 		
-		Assert.assertTrue("There should be two service requests in ServiceNow.", count == 2);
-		
+		Assert.assertTrue("There should be two service requests in ServiceNow, but there are " + count + ".", count == 2);		
     }
     
     private List<GetRecordsResult> getReqItem(String parentId) throws MuleException, Exception{
@@ -186,7 +182,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 			flow.process(getTestEvent(id));					
 		}
 				
-    	// Delete the created users in Workday
+    	// Terminate the created users in Workday
 		flow = getSubFlow("getWorkdaytoTerminateFlow");
 		flow.initialise();
 		

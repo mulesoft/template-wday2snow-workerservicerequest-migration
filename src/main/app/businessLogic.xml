@@ -22,7 +22,13 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd">
 	<data-mapper:config name="Pojo_To_Map"
 		transformationGraphPath="pojo_to_map.grf" doc:name="Pojo_To_Map" />
+				    
+    <flow name="mainFlow" doc:name="mainFlow">
+        <batch:execute name="createServiceNowAssets" doc:name="Batch Execute"/>
+        <exception-strategy ref="defaultChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
+    </flow>
 
+		
 	<batch:job name="createServiceNowAssets">
 		<batch:threading-profile poolExhaustedAction="WAIT" />
 		<batch:input>
@@ -65,7 +71,7 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
 output['approval'] = "Requested";
 output['active'] = true;
 output['assignedTo'] = '${snow.pc.assignedTo}';
-output['location'] = '${snow.locationA}';
+output['location'] = '${snow.location}';
 output['price'] = new BigDecimal('${snow.pc.price}');
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
 output['dueDate'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.pc.deliveryDays}) * 86400000));
@@ -92,7 +98,7 @@ payload = output;]]></expression-component>
 output['approval'] = "Requested";
 output['active'] = true;
 output['assignedTo'] = '${snow.desk.assignedTo}';
-output['location'] = '${snow.locationA}';
+output['location'] = '${snow.location}';
 output['price'] = new BigDecimal('${snow.desk.price}');
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
 output['dueDate'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.desk.deliveryDays}) * 86400000));

@@ -8,67 +8,70 @@ package org.mule.templates.utils;
 
 public class Employee {
 
-	  private String givenName;
-	  private String familyName;
-	  private String email;
-	  private String phone;
-	  private String addr1;
-	  private String city;
-	  private String state;
-	  private String postal;
-	  private String zip;
-	  private String country;
-	  private String reqID;
-	  private String hireDate;
-	  private String startDate;
-	  private String title;
-	  private String location;
-	  private String eeType;
-	  private String timeType;
-	  private String payRateType;
-	  private String basePayCurrency;
-	  private String basePay;
-	  private String basePayFreq;
-	  private String jobProfile;
-	  private String mgrID;
-	  private String id;
-	  
-	  public Employee(String givenNameValue, String familyNameValue, String emailValue, String phoneValue, String addr1Value, String cityValue, String stateValue,
-	  				String zipValue, String countryValue, String reqIDValue, String hireDateValue, String startDateValue, String titleValue,
-	  				String locationValue, String eeTypeValue, String timeTypeValue, String payRateTypeValue, String basePayCurrencyValue, 
-	  				String basePayValue, String basePayFreqValue, String jobProfileValue, String mgrIDValue, String idValue) {
-	  	givenName = givenNameValue;
-	  	familyName = familyNameValue;
-	    email = emailValue;
-	    addr1 = addr1Value;
-	    city = cityValue;
-	    phone = phoneValue;
-	    state = stateValue;
-	    zip = zipValue;
-	    country = countryValue;
-	    reqID = reqIDValue;
-	    hireDate = hireDateValue;
-	    startDate = startDateValue;
-	    title = titleValue;
+	private String givenName;
+	private String familyName;
+	private String email;
+	private String phone;
+	private String addr1;
+	private String city;
+	private String state;
+	private String postal;
+	private String zip;
+	private String country;
+	private String reqID;
+	private String hireDate;
+	private String startDate;
+	private String title;
+	private String location;
+	private String eeType;
+	private String timeType;
+	private String payRateType;
+	private String basePayCurrency;
+	private String basePay;
+	private String basePayFreq;
+	private String jobProfile;
+	private String mgrID;
+	private String id;
+
+	public Employee(String givenNameValue, String familyNameValue,
+			String emailValue, String phoneValue, String addr1Value,
+			String cityValue, String stateValue, String zipValue,
+			String countryValue, String reqIDValue, String hireDateValue,
+			String startDateValue, String titleValue, String locationValue,
+			String eeTypeValue, String timeTypeValue, String payRateTypeValue,
+			String basePayCurrencyValue, String basePayValue,
+			String basePayFreqValue, String jobProfileValue, String mgrIDValue,
+			String idValue) {
+		givenName = givenNameValue;
+		familyName = familyNameValue;
+		email = emailValue;
+		addr1 = addr1Value;
+		city = cityValue;
+		phone = phoneValue;
+		state = stateValue;
+		zip = zipValue;
+		country = countryValue;
+		reqID = reqIDValue;
+		hireDate = hireDateValue;
+		startDate = startDateValue;
+		title = titleValue;
 		location = locationValue;
 		eeType = eeTypeValue;
 		timeType = timeTypeValue;
 		payRateType = payRateTypeValue;
-	    basePayCurrency = basePayCurrencyValue;
-	    basePay = basePayValue;
-	    basePayFreq = basePayFreqValue;
-	    jobProfile = jobProfileValue;
-	    mgrID = mgrIDValue;
-	    id = idValue;
-	  }
-	  
-	  public String getGivenName() {
-			return givenName;
-		}
-	  
-	  
+		basePayCurrency = basePayCurrencyValue;
+		basePay = basePayValue;
+		basePayFreq = basePayFreqValue;
+		jobProfile = jobProfileValue;
+		mgrID = mgrIDValue;
+		id = idValue;
+	}
 
-		public String getId() {
+	public String getGivenName() {
+		return givenName;
+	}
+
+	public String getId() {
 		return id;
 	}
 
@@ -76,187 +79,189 @@ public class Employee {
 		this.id = id;
 	}
 
-		public void setGivenName(String givenName) {
-			this.givenName = givenName;
-		}
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
 
-		public String getFamilyName() {
-			return familyName;
-		}
+	public String getFamilyName() {
+		return familyName;
+	}
 
-		public void setFamilyName(String familyName) {
-			this.familyName = familyName;
-		}
+	public void setFamilyName(String familyName) {
+		this.familyName = familyName;
+	}
 
-		public String getEmail() {
-			return email;
-		}
+	public String getEmail() {
+		return email;
+	}
 
-		public void setEmail(String email) {
-			this.email = email;
-		}
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-		public String getPhone() {
-			return phone;
-		}
+	public String getPhone() {
+		return phone;
+	}
 
-		public void setPhone(String phone) {
-			this.phone = phone;
-		}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-		public String getAddr1() {
-			return addr1;
-		}
+	public String getAddr1() {
+		return addr1;
+	}
 
-		public void setAddr1(String addr1) {
-			this.addr1 = addr1;
-		}
+	public void setAddr1(String addr1) {
+		this.addr1 = addr1;
+	}
 
-		public String getCity() {
-			return city;
-		}
+	public String getCity() {
+		return city;
+	}
 
-		public void setCity(String city) {
-			this.city = city;
-		}
+	public void setCity(String city) {
+		this.city = city;
+	}
 
-		public String getState() {
-			return state;
-		}
+	public String getState() {
+		return state;
+	}
 
-		public void setState(String state) {
-			this.state = state;
-		}
+	public void setState(String state) {
+		this.state = state;
+	}
 
-		public String getPostal() {
-			return postal;
-		}
+	public String getPostal() {
+		return postal;
+	}
 
-		public void setPostal(String postal) {
-			this.postal = postal;
-		}
+	public void setPostal(String postal) {
+		this.postal = postal;
+	}
 
-		public String getZip() {
-			return zip;
-		}
+	public String getZip() {
+		return zip;
+	}
 
-		public void setZip(String zip) {
-			this.zip = zip;
-		}
+	public void setZip(String zip) {
+		this.zip = zip;
+	}
 
-		public String getCountry() {
-			return country;
-		}
+	public String getCountry() {
+		return country;
+	}
 
-		public void setCountry(String country) {
-			this.country = country;
-		}
+	public void setCountry(String country) {
+		this.country = country;
+	}
 
-		public String getReqID() {
-			return reqID;
-		}
+	public String getReqID() {
+		return reqID;
+	}
 
-		public void setReqID(String reqID) {
-			this.reqID = reqID;
-		}
+	public void setReqID(String reqID) {
+		this.reqID = reqID;
+	}
 
-		public String getHireDate() {
-			return hireDate;
-		}
+	public String getHireDate() {
+		return hireDate;
+	}
 
-		public void setHireDate(String hireDate) {
-			this.hireDate = hireDate;
-		}
+	public void setHireDate(String hireDate) {
+		this.hireDate = hireDate;
+	}
 
-		public String getStartDate() {
-			return startDate;
-		}
+	public String getStartDate() {
+		return startDate;
+	}
 
-		public void setStartDate(String startDate) {
-			this.startDate = startDate;
-		}
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
 
-		public String getTitle() {
-			return title;
-		}
+	public String getTitle() {
+		return title;
+	}
 
-		public void setTitle(String title) {
-			this.title = title;
-		}
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-		public String getLocation() {
-			return location;
-		}
+	public String getLocation() {
+		return location;
+	}
 
-		public void setLocation(String location) {
-			this.location = location;
-		}
+	public void setLocation(String location) {
+		this.location = location;
+	}
 
-		public String getEeType() {
-			return eeType;
-		}
+	public String getEeType() {
+		return eeType;
+	}
 
-		public void setEeType(String eeType) {
-			this.eeType = eeType;
-		}
+	public void setEeType(String eeType) {
+		this.eeType = eeType;
+	}
 
-		public String getTimeType() {
-			return timeType;
-		}
+	public String getTimeType() {
+		return timeType;
+	}
 
-		public void setTimeType(String timeType) {
-			this.timeType = timeType;
-		}
+	public void setTimeType(String timeType) {
+		this.timeType = timeType;
+	}
 
-		public String getPayRateType() {
-			return payRateType;
-		}
+	public String getPayRateType() {
+		return payRateType;
+	}
 
-		public void setPayRateType(String payRateType) {
-			this.payRateType = payRateType;
-		}
+	public void setPayRateType(String payRateType) {
+		this.payRateType = payRateType;
+	}
 
-		public String getBasePayCurrency() {
-			return basePayCurrency;
-		}
+	public String getBasePayCurrency() {
+		return basePayCurrency;
+	}
 
-		public void setBasePayCurrency(String basePayCurrency) {
-			this.basePayCurrency = basePayCurrency;
-		}
+	public void setBasePayCurrency(String basePayCurrency) {
+		this.basePayCurrency = basePayCurrency;
+	}
 
-		public String getBasePay() {
-			return basePay;
-		}
+	public String getBasePay() {
+		return basePay;
+	}
 
-		public void setBasePay(String basePay) {
-			this.basePay = basePay;
-		}
+	public void setBasePay(String basePay) {
+		this.basePay = basePay;
+	}
 
-		public String getBasePayFreq() {
-			return basePayFreq;
-		}
+	public String getBasePayFreq() {
+		return basePayFreq;
+	}
 
-		public void setBasePayFreq(String basePayFreq) {
-			this.basePayFreq = basePayFreq;
-		}
-		public String getJobProfile() {
-			return jobProfile;
-		}
+	public void setBasePayFreq(String basePayFreq) {
+		this.basePayFreq = basePayFreq;
+	}
 
-		public void setJobProfile(String jobProfile) {
-			this.jobProfile = jobProfile;
-		}
-		public String getMgrID() {
-			return mgrID;
-		}
+	public String getJobProfile() {
+		return jobProfile;
+	}
 
-		public void setMgrID(String mgrID) {
-			this.mgrID = mgrID;
-		}
+	public void setJobProfile(String jobProfile) {
+		this.jobProfile = jobProfile;
+	}
 
-		@Override
-		public String toString() {
-			return "Jobvite Candidate: " + givenName + " " + familyName;
-					
-		}
+	public String getMgrID() {
+		return mgrID;
+	}
+
+	public void setMgrID(String mgrID) {
+		this.mgrID = mgrID;
+	}
+
+	@Override
+	public String toString() {
+		return "Jobvite Candidate: " + givenName + " " + familyName;
+
+	}
 }

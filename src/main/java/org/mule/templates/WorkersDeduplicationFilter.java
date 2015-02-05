@@ -6,9 +6,10 @@
 
 package org.mule.templates;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
@@ -16,6 +17,7 @@ import org.mule.transport.NullPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.workday.hr.EmailAddressInformationDataType;
 import com.workday.hr.EventTargetTransactionLogEntryDataType;
 import com.workday.hr.TransactionLogEntryType;
 import com.workday.hr.WorkerType;
@@ -27,55 +29,55 @@ import com.workday.hr.WorkerType;
  */
 public class WorkersDeduplicationFilter implements Filter {
 
-	Logger logger = LoggerFactory.getLogger(WorkersDeduplicationFilter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkersDeduplicationFilter.class);
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean accept(MuleMessage message) {
-		if (message.getPayload() instanceof NullPayload)
+		
+		if (message.getPayload() instanceof NullPayload) {
 			return false;
-
-		List<WorkerType> payload = (List<WorkerType>) message.getPayload();
-		List<String> emails = new ArrayList<String>();
-		Iterator<WorkerType> iterator = payload.iterator();
-		logger.info("total records:" + payload.size());
+		}
+		
+		final List<WorkerType> payload = (List<WorkerType>) message.getPayload();
+		final Set<String> emails = new HashSet<String>();
+		final Iterator<WorkerType> iterator = payload.iterator();
+		LOGGER.info("Total records:" + payload.size());
 
 		while (iterator.hasNext()) {
-			WorkerType next = iterator.next();
-			EventTargetTransactionLogEntryDataType log = next.getWorkerData()
-					.getTransactionLogEntryData();
+			final WorkerType next = iterator.next();
+			final EventTargetTransactionLogEntryDataType log = next.getWorkerData().getTransactionLogEntryData();
 
 			if (log != null) {
-				boolean was = false;
-				for (TransactionLogEntryType entry : log
-						.getTransactionLogEntry()) {
+				boolean wasTerminated = false;
+				for (TransactionLogEntryType entry : log.getTransactionLogEntry()) {
 					if (entry.getTransactionLogData().getTransactionLogDescription().startsWith("Terminate:")) {
 						iterator.remove();
-						was = true;
+						wasTerminated = true;
 						break;
 					}
 				}
-				if (was) {
+				if (wasTerminated) {
 					continue;
 				}
 			}
 
-			if (next.getWorkerData().getPersonalData().getContactData()
-					.getEmailAddressData().isEmpty()) {
+			final List<EmailAddressInformationDataType> emailAddressData = next.getWorkerData().getPersonalData().getContactData().getEmailAddressData();
+			
+			if (emailAddressData.isEmpty()) {
 				iterator.remove();
 				continue;
 			}
-			final String email = next.getWorkerData().getPersonalData()
-					.getContactData().getEmailAddressData().get(0).getEmailAddress();
-			if (emails.contains(email)) {
+			
+			final String email = emailAddressData.get(0).getEmailAddress();
+			
+			if (!emails.add(email)) {
 				iterator.remove();
-			} else {
-				emails.add(email);
 			}
 		}
 
-		logger.info("unique emails:" + emails.size());
-		logger.info("employed workers:" + payload.size());
+		LOGGER.info("Unique emails:" + emails.size());
+		LOGGER.info("Unique workers:" + payload.size());
 		return true;
 	}
 }

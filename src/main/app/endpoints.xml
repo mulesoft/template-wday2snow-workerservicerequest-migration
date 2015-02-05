@@ -17,37 +17,6 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
 http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd">
-    
-
-<!-- 	<flow name="triggerFlow" processingStrategy="synchronous" -->
-<!-- 		doc:name="triggerFlow" -->
-<!-- 		doc:description="This is the simpliest entry point to start the excecution of your Kick"> -->
-		
-<!--  		<poll doc:name="fireup Worker synchronization">  -->
-<!-- 			<fixed-frequency-scheduler frequency="${poll.frequencyMillis}" -->
-<!-- 				startDelay="${poll.startDelayMillis}" /> -->
-<!-- 			<watermark variable="lastQueryDate" default-expression="${watermark.default.expression}" -->
-<!-- 				update-expression="#[ new java.util.Date() ]" /> -->
-<!-- 			<processor-chain doc:name="query Workers and set collection"> -->
-<!--                 <logger message="Fetching Workday updates...#[new java.util.Date()]" level="INFO" doc:name="log 'Fetching workday updates...'"/> -->
-<!-- 				<wd-hr:get-workers config-ref="Workday_Human_Resource" -->
-<!-- 					doc:name="get Workers from Workday Human Resource" -->
-<!-- 					workersRequest-ref="#[org.mule.templates.WorkersRequest.create(lastQueryDate)]"></wd-hr:get-workers> -->
-<!-- 				<set-payload value="#[payload.responseData == null ? null : payload.responseData.worker]" -->
-<!-- 					doc:name="set to Worker collection" /> -->
-
-<!-- 			</processor-chain> -->
-<!-- 		</poll> -->
-
-<!--         <logger level="INFO" doc:name="log worker's name" message="#[groovy: payload.collect { it.getWorkerData().getPersonalData().getNameData().getLegalNameData().getNameDetailData().getFirstName() +  ' '+ it.getWorkerData().getPersonalData().getNameData().getLegalNameData().getNameDetailData().getLastName() } ]"/> -->
-<!--         <flow-ref name="mainFlow" doc:name="Flow Reference"/> -->
-	
-<!-- 	</flow> -->
-    <flow name="mainFlow" doc:name="mainFlow">
-        <batch:execute name="createServiceNowAssets" doc:name="Batch Execute"/>
-        <exception-strategy ref="defaultChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
-    </flow>
-
 
     <flow name="triggerFlow" doc:name="triggerFlow" processingStrategy="synchronous" doc:description="This is the simpliest entry point to start the excecution of your Kick
 Here you should: 
@@ -56,7 +25,7 @@ Here you should:
 Here you should not: 
 	* Run validations against external systems
 	* Choose flow of your application based on input parameters">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${http.port}" path="migrateemployees" doc:name="start Employees synchronization"/>
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${http.port}" path="migrateworkers" doc:name="start Workers synchronization"/>
         <flow-ref name="mainFlow" doc:name="call mainFlow"/>
         <set-payload value="&lt;h1&gt;Batch Process initiated&lt;/h1&gt;&lt;b&gt;ID:&lt;/b&gt;#[payload.getId()]&lt;br/&gt;&lt;b&gt;Records to Be Processed: &lt;/b&gt;#[payload.getRecordCount()]&lt;br/&gt; &lt;b&gt;Start execution on: &lt;/b&gt;#[new java.util.Date()]" doc:name="Set Batch Status response Payload"/>
         <http:response-builder status="200" contentType="text/html" doc:name="Build HTTP Response Message"/>
