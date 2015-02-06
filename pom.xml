@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.mule.templates</groupId>
 		<artifactId>templates-tooling-parent-pom</artifactId>
-		<version>1.0.7</version>
+		<version>1.0.0</version>
 	</parent>
 
 	<artifactId>template-wday2snow-workerservicerequest-migration</artifactId>
@@ -102,8 +102,8 @@
 		</repository>
 	</repositories>	
 	<scm>
-		<connection>scm:git:https://github.com/mulesoft/template-wday2snow-worker-broadcast.git</connection>
-		<developerConnection>scm:git:https://github.com/mulesoft/template-wday2snow-worker-broadcast.git</developerConnection>
-		<url>http://github.com/mulesoft/template-wday2snow-worker-broadcast</url>
+		<connection>scm:git:https://github.com/mulesoft/template-wday2snow-workerservicerequest-migration.git</connection>
+		<developerConnection>scm:git:https://github.com/mulesoft/template-wday2snow-workerservicerequest-migration.git</developerConnection>
+		<url>http://github.com/mulesoft/template-wday2snow-workerservicerequest-migration</url>
 	</scm>
 </project>

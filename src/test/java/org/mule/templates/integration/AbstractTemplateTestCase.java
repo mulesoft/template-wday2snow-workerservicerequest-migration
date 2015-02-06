@@ -81,5 +81,4 @@ public class AbstractTemplateTestCase extends FunctionalTestCase {
 
 		return builder.toString();
 	}
-
 }
