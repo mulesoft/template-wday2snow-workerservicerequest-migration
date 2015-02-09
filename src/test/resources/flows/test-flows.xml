@@ -51,9 +51,6 @@ http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mu
             </servicenow:get-records-request>
         </servicenow:get-records>
     </sub-flow>
-    <sub-flow name="getWorkdayEmployee" doc:name="getWorkdayEmployee">
-        <wd-hr:get-employee config-ref="Workday_Human_Resource" doc:name="Workday Human Resource"/>
-    </sub-flow>
 
     
     <sub-flow name="getWorkdaytoTerminateFlow" doc:name="getWorkdaytoTerminateFlow">

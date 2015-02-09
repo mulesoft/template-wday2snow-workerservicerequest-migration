@@ -261,7 +261,6 @@ public class Employee {
 
 	@Override
 	public String toString() {
-		return "Jobvite Candidate: " + givenName + " " + familyName;
-
+		return "Job Candidate: " + givenName + " " + familyName;
 	}
 }

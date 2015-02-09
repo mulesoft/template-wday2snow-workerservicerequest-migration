@@ -138,9 +138,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		Map<String, String> inputMap = new HashMap<String, String>();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		logger.info("Starting date: " + sdf.format(startingDate));
-		inputMap.put("sysUpdatedOn", ">" + DateUtil.applyTimeZone(startingDate, "yyyy-MM-dd HH:mm:ss", "GMT"));		
- //       inputMap.put("assignedTo", ">" + DateUtil.applyTimeZone(startingDate, "yyyy-MM-dd HH:mm:ss", "GMT"));        
-
+		inputMap.put("sysUpdatedOn", ">" + DateUtil.applyTimeZone(startingDate, "yyyy-MM-dd HH:mm:ss", "GMT"));
 		
 		MuleEvent response = flow.process(getTestEvent(ASSIGNED_TO, MessageExchangePattern.REQUEST_RESPONSE));
 		GetRecordsResponse snowRes = ((GetRecordsResponse)response.getMessage().getPayload());
