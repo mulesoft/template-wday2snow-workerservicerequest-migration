@@ -41,26 +41,28 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
 		<batch:process-records>
 
 			<batch:step name="insertPcRequest">
-				<flow-ref name="insertPcRequest" doc:name="Flow Reference" />
+				<flow-ref name="insertPcRequest" doc:name="Call insertPcRequest" />
 
 			</batch:step>
 
 			<batch:step name="insertDeskRequest">
-				<flow-ref name="insertDeskRequest" doc:name="Flow Reference" />
+				<flow-ref name="insertDeskRequest" doc:name="Call insertDeskRequest" />
 
 			</batch:step>
 
 		</batch:process-records>
 		<batch:on-complete>
-			<json:object-to-json-transformer
-				doc:name="Transform BatchJobInstance to JSON" />
+
 			<scatter-gather doc:name="All">
-				<logger message="Migration process has finished: #[payload]"
-					level="INFO" doc:name="Log 'Migration process has finished'" />
-				<smtp:outbound-endpoint host="${smtp.host}"
-					responseTimeout="10000" doc:name="SMTP" connector-ref="gmailConnector"
-					from="${mail.from}" password="${smtp.password}" port="${smtp.port}"
-					subject="${mail.subject}" to="${mail.to}" user="${smtp.user}" />
+                <processor-chain>
+                    <json:object-to-json-transformer doc:name="Transform BatchJobInstance to JSON"/>
+                    <logger message="Migration process has finished: #[payload]" level="INFO" doc:name="Log 'Migration process has finished'"/>
+                </processor-chain>
+                <processor-chain>
+                    <parse-template location="./src/main/resources/email/body.html" doc:name="Parse Template"/>
+                    <smtp:outbound-endpoint host="${smtp.host}" port="${smtp.port}" user="${smtp.user}" password="${smtp.password}" connector-ref="gmailConnector" to="${mail.to}" from="${mail.from}" subject="${mail.subject}" responseTimeout="10000" doc:name="Send mail"/>
+                </processor-chain>
+
 			</scatter-gather>
 		</batch:on-complete>
 	</batch:job>
