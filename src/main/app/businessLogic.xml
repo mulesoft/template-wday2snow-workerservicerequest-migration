@@ -7,7 +7,7 @@
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
-	version="EE-3.5.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	version="EE-3.6.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
@@ -20,11 +20,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd">
 	<data-mapper:config name="Pojo_To_Map"
 		transformationGraphPath="pojo_to_map.grf" doc:name="Pojo_To_Map" />
-				    
-    <flow name="mainFlow" doc:name="mainFlow">
-        <batch:execute name="createServiceNowAssets" doc:name="Batch Execute"/>
-        <exception-strategy ref="defaultChoiceExceptionStrategy" doc:name="Reference Exception Strategy"/>
-    </flow>
+
 
 		
 	<batch:job name="createServiceNowAssets">
@@ -66,7 +62,7 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
 			</scatter-gather>
 		</batch:on-complete>
 	</batch:job>
-	<sub-flow name="insertPcRequest" doc:name="insertPcRequest">
+	<sub-flow name="insertPcRequest" >
 		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['approval'] = "Requested";
 output['active'] = true;
@@ -93,7 +89,7 @@ output['price'] = ${snow.pc.price};
 payload = output;]]></expression-component>
 		<flow-ref name="insertItemFlow" doc:name="Call insertItemFlow" />
 	</sub-flow>
-	<sub-flow name="insertDeskRequest" doc:name="insertDeskRequest">
+	<sub-flow name="insertDeskRequest" >
 		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['approval'] = "Requested";
 output['active'] = true;
@@ -121,7 +117,7 @@ payload = output;]]></expression-component>
 		<flow-ref name="insertItemFlow" doc:name="Call insertItemFlow" />
 	</sub-flow>
 
-	<sub-flow name="insertRequestFlow" doc:name="insertRequestFlow">
+	<sub-flow name="insertRequestFlow" >
 		<servicenow:insert config-ref="ServiceNow" type="SC_REQUEST"
 			doc:name="ServiceNow">
 			<servicenow:insert-request ref="#[payload]" />
@@ -129,7 +125,7 @@ payload = output;]]></expression-component>
 		<logger message="request: #[payload]" level="INFO"
 			doc:name="Log the insert response" />
 	</sub-flow>
-	<sub-flow name="insertItemFlow" doc:name="insertItemFlow">
+	<sub-flow name="insertItemFlow" >
 		<servicenow:insert config-ref="ServiceNow" type="SC_REQ_ITEM"
 			doc:name="ServiceNow" />
 		<json:object-to-json-transformer
