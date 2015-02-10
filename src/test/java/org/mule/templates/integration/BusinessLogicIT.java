@@ -128,7 +128,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 	@Test
     public void testMainFlow() throws Exception {
 		Thread.sleep(10000);
-		runFlow("mainFlow");
+		runFlow("triggerFlow");
 		// Wait for the batch job executed by the poll flow to finish
 		helper.awaitJobTermination(TIMEOUT_MILLIS * 1000, 500);
 		helper.assertJobWasSuccessful();	
