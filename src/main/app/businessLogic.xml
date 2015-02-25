@@ -63,7 +63,7 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
 		</batch:on-complete>
 	</batch:job>
 	<sub-flow name="insertPcRequest" >
-		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
+		<expression-component doc:name="Prepare InsertPcRequest"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['approval'] = "Requested";
 output['active'] = true;
 output['assignedTo'] = '${snow.pc.assignedTo}';
@@ -72,17 +72,17 @@ output['price'] = new BigDecimal('${snow.pc.price}');
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
 output['dueDate'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.pc.deliveryDays}) * 86400000));
 payload = output;]]></expression-component>
-		<enricher source="payload" target="recordVars['request1']"
-			doc:name="store in recordVars['request1']">
+		<enricher source="payload" target="recordVars['pcRequest']"
+			doc:name="store in recordVars['pcRequest']">
 			<flow-ref name="insertRequestFlow" doc:name="Call insertRequestFlow" />
 		</enricher>
-		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
+		<expression-component doc:name="Prepare InsertPcItem"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['active'] = true;
 output['approval'] = "requested";
 output['catItem'] = '${snow.pc.model}';
 output['approvalSet'] = '${snow.pc.assignedTo}';
-output['request'] = recordVars['request1']['sysId'];
-output['parent'] = recordVars['request1']['sysId'];
+output['request'] = recordVars['pcRequest']['sysId'];
+output['parent'] = recordVars['pcRequest']['sysId'];
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
 output['estimatedDelivery'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.pc.deliveryDays}) * 86400000));
 output['price'] = ${snow.pc.price};
@@ -90,7 +90,7 @@ payload = output;]]></expression-component>
 		<flow-ref name="insertItemFlow" doc:name="Call insertItemFlow" />
 	</sub-flow>
 	<sub-flow name="insertDeskRequest" >
-		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
+		<expression-component doc:name="Prepare InsertDeskRequest"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['approval'] = "Requested";
 output['active'] = true;
 output['assignedTo'] = '${snow.desk.assignedTo}';
@@ -99,17 +99,17 @@ output['price'] = new BigDecimal('${snow.desk.price}');
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
 output['dueDate'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.desk.deliveryDays}) * 86400000));
 payload = output;]]></expression-component>
-		<enricher source="payload" target="recordVars['request2']"
-			doc:name="store in recordVars['request1']">
+		<enricher source="payload" target="recordVars['deskRequest']"
+			doc:name="store in recordVars['deskRequest']">
 			<flow-ref name="insertRequestFlow" doc:name="Call insertRequestFlow" />
 		</enricher>
-		<expression-component doc:name="Expression"><![CDATA[java.util.Map output = new java.util.HashMap();
+		<expression-component doc:name="Prepare InsertDeskItem"><![CDATA[java.util.Map output = new java.util.HashMap();
 output['active'] = true;
 output['approval'] = "requested";
 output['catItem'] = '${snow.desk.model}';
 output['approvalSet'] = '${snow.desk.assignedTo}';
-output['request'] = recordVars['request2']['sysId'];
-output['parent'] = recordVars['request2']['sysId'];
+output['request'] = recordVars['deskRequest']['sysId'];
+output['parent'] = recordVars['deskRequest']['sysId'];
 java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		
 output['estimatedDelivery'] = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.desk.deliveryDays}) * 86400000));
 output['price'] = ${snow.desk.price};
