@@ -28,7 +28,7 @@ Please review the terms of the license before downloading and using this templat
 # Use Case <a name="usecase"/>
 As a Workday admin I want to create 2 service requests in ServiceNow for every new unique worker from Workday
 			
-1. One service request for setting up a desk
+1. one service request for setting up a desk
 2. one service request for setting up a computer	
 
 As implemented, this Anypoint Template leverages the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
