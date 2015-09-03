@@ -6,6 +6,7 @@
 
 package org.mule.templates;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +37,7 @@ public class WorkersDeduplicationFilter implements Filter {
 	public boolean accept(MuleMessage message) {
 		
 		if (message.getPayload() instanceof NullPayload) {
+			message.setPayload(new ArrayList<WorkerType>());
 			return false;
 		}
 		

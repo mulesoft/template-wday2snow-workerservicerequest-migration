@@ -6,6 +6,8 @@
 
 package org.mule.templates.utils;
 
+import java.util.Date;
+
 public class Employee {
 
 	private String givenName;
@@ -19,8 +21,8 @@ public class Employee {
 	private String zip;
 	private String country;
 	private String reqID;
-	private String hireDate;
-	private String startDate;
+	private Date hireDate;
+	private Date startDate;
 	private String title;
 	private String location;
 	private String eeType;
@@ -36,8 +38,8 @@ public class Employee {
 	public Employee(String givenNameValue, String familyNameValue,
 			String emailValue, String phoneValue, String addr1Value,
 			String cityValue, String stateValue, String zipValue,
-			String countryValue, String reqIDValue, String hireDateValue,
-			String startDateValue, String titleValue, String locationValue,
+			String countryValue, String reqIDValue, Date hireDateValue,
+			Date startDateValue, String titleValue, String locationValue,
 			String eeTypeValue, String timeTypeValue, String payRateTypeValue,
 			String basePayCurrencyValue, String basePayValue,
 			String basePayFreqValue, String jobProfileValue, String mgrIDValue,
@@ -163,19 +165,19 @@ public class Employee {
 		this.reqID = reqID;
 	}
 
-	public String getHireDate() {
+	public Date getHireDate() {
 		return hireDate;
 	}
 
-	public void setHireDate(String hireDate) {
+	public void setHireDate(Date hireDate) {
 		this.hireDate = hireDate;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 

@@ -32,8 +32,8 @@ As a Workday admin I want to create 2 service requests in ServiceNow for every n
 2. one service request for setting up a computer	
 
 As implemented, this Anypoint Template leverages the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
-The batch job is divided in Input, Process and On Complete stages.
-During the Input stage the Anypoint Template will go to the Workday and query all the existing active workers that match the filter criteria. The criteria is based on manipulations starting from the given date.
+The batch job is divided into Input, Process and On Complete stages.
+During the Input stage the Anypoint Template will query Workday for all the existing active workers that match the filtering criteria. The criteria is based on manipulations starting from the given date.
 The Process stage will create new service request assigned to the concrete item - desk or computer in Service Now for each worker.
 Finally, during the On Complete stage the Anypoint Template will print output statistics data into the console and send a notification email with the result of the batch execution.
 
@@ -63,6 +63,10 @@ There are no particular considerations for this Anypoint Template regarding Serv
 There are no particular considerations for this Anypoint Template regarding Workday as data origin.
 
 
+
+
+
+
 # Run it! <a name="runit"/>
 Simple steps to get Workday Worker to ServiceNow Request Migration running.
 In any of the ways you would like to run this Anypoint Template this is an example of the output you'll see after hitting the HTTP endpoint:
@@ -71,7 +75,7 @@ In any of the ways you would like to run this Anypoint Template this is an examp
 <h1>Batch Process initiated</h1>
 <b>ID:</b>6eea3cc6-7c96-11e3-9a65-55f9f3ae584e<br/>
 <b>Records to Be Processed: </b>9<br/>
-<b>Start execution on: </b>Mon Jan 12 18:05:33 GMT-03:00 2015
+<b>Start execution on: </b>Mon Sep 03 18:05:33 GMT-03:00 2015
 </pre>
 
 ## Running on premise <a name="runonopremise"/>
@@ -108,7 +112,7 @@ Once you have imported you Anypoint Template into Anypoint Studio you need to fo
 
 ### Running on Mule ESB stand alone <a name="runonmuleesbstandalone"/>
 Complete all properties in one of the property files, for example in [mule.prod.properties] (../master/src/main/resources/mule.prod.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=prod`. 
-After this, to trigger the use case you just need to hit the local HTTP endpoint with the port you configured in your file. If this is, for instance, `9090` then you should hit: `http://localhost:9090/migrateworkers` and this will output a summary report and send it in the mail.
+After this, to trigger the use case you just need to hit the local HTTP endpoint with the port you configured in your configuration file. If this is, for instance, `9090` then you should hit: `http://localhost:9090/migrateworkers` and this will output a summary report and send it in the email.
 
 ## Running on CloudHub <a name="runoncloudhub"/>
 While [creating your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) (Or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**.
@@ -123,7 +127,7 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 ### Application configuration
 ### Application configuration
 + http.port `9090`
-+ migration.startDate `"2015-01-29T09:10:00.000+0200"`
++ migration.startDate `"2015-09-03T09:10:00.000+0200"`
 
 #### Workday Connector configuration
 + wday.user `admin@workday`
