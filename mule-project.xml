@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<mule-project xmlns="http://www.mulesoft.com/tooling/project" runtimeId="org.mule.tooling.server.3.6.0.ee" schemaVersion="3.5.0.0">
-    <name>template-wday2snow-workerservicerequest-migration</name>
+<mule-project xmlns="http://www.mulesoft.com/tooling/project" runtimeId="org.mule.tooling.server.3.7.1.ee" schemaVersion="3.5.0.0">
+    <name>template-wday2snow-workerservicerequest-migration-1.2.0-SNAPSHOT</name>
     <description></description>
-    <muleExtension name="ServiceNow" qualifier="org.mule.tooling.ui.contribution.servicenow.3.5.0"/>
-    <muleExtension name="Workday Human Resource" qualifier="org.mule.tooling.ui.contribution.wd-hr"/>
+    <muleExtension name="Workday Human Resource" qualifier="org.mule.tooling.ui.contribution.wd-hr.3.5.0"/>
+    <muleExtension name="ServiceNow" qualifier="org.mule.tooling.ui.contribution.servicenow.3.7.0"/>
 </mule-project>

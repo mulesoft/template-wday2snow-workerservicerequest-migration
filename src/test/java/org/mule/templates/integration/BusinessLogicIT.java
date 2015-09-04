@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,8 +34,6 @@ import org.mule.templates.utils.DateUtil;
 import org.mule.templates.utils.Employee;
 
 import com.mulesoft.module.batch.BatchTestHelper;
-import com.servicenow.servicecatalog.screqitem.GetRecordsResponse.GetRecordsResult;
-import com.servicenow.servicecatalog.screquest.GetRecordsResponse;
 import com.workday.hr.EmployeeGetType;
 import com.workday.hr.EmployeeReferenceType;
 import com.workday.hr.ExternalIntegrationIDReferenceDataType;
@@ -55,6 +53,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 	private static final String TEMPLATE_PREFIX = "wday2snow-workerservicerequest-migration";
 	protected static final String PATH_TO_TEST_PROPERTIES = "./src/test/resources/mule.test.properties";
 	protected static final int TIMEOUT_MILLIS = 600;
+	private static final Logger LOGGER = LogManager.getLogger(BusinessLogicIT.class);
 	private final String EMAIL = "bwillis@gmailtest.com";
 	
 	private static String PC_MODEL;
@@ -76,7 +75,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     	try {
     	props.load(new FileInputStream(PATH_TO_TEST_PROPERTIES));
     	} catch (Exception e) {
-    		System.out.println("Error occured while reading mule.test.properties" + e);
+    		LOGGER.error("Error occured while reading mule.test.properties" + e);
     	} 
     	
     	WDAY_TERMINATION_ID = props.getProperty("wday.termination.id");
@@ -88,14 +87,15 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     	Calendar cal = Calendar.getInstance();
     	cal.add(Calendar.HOUR_OF_DAY, -1);
     	startingDate = cal.getTime();
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");    	
-    	System.setProperty("migration.startDate", "\"" + sdf.format(new Date()) + "\"");
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");    	
+    	System.setProperty("migration.startDate", sdf.format(new Date()));
+    	System.setProperty("http.port", "9090");
     }
 
     @Before
     public void setUp() throws Exception {
     	helper = new BatchTestHelper(muleContext);	
-    	logger.info("Starting date is set to: " + startingDate);
+    	LOGGER.info("Starting date is set to: " + startingDate);
 		createTestDataInSandBox();
     }
 
@@ -105,11 +105,11 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     }    
     
     private void createTestDataInSandBox() throws MuleException, Exception {
-		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("hireEmployee");
-		flow.initialise();
-		logger.info("Creating a workday employee...");
+		SubflowInterceptingChainLifecycleWrapper hireEmployeeFlow = getSubFlow("hireEmployee");
+		hireEmployeeFlow.initialise();
+		LOGGER.info("Creating a workday employee...");
 		try {
-			flow.process(getTestEvent(prepareNewHire(), MessageExchangePattern.REQUEST_RESPONSE));						
+			hireEmployeeFlow.process(getTestEvent(prepareNewHire().get(0), MessageExchangePattern.REQUEST_RESPONSE));						
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -117,14 +117,15 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     
     private List<Object> prepareNewHire(){
 		EXT_ID = TEMPLATE_PREFIX + System.currentTimeMillis();
-		logger.info("Employee name: " + EXT_ID);
+		LOGGER.info("Employee name: " + EXT_ID);
 		employee = new Employee(EXT_ID, "Willis1", EMAIL, "650-232-2323", "999 Main St", "San Francisco", "CA", "94105", "US", "o7aHYfwG", 
-				"2014-04-17-07:00", "2014-04-21-07:00", "QA Engineer", "San_Francisco_site", "Regular", "Full Time", "Salary", "USD", "140000", "Annual", "39905", "21440", EXT_ID);
+				new Date(), new Date(), "QA Engineer", "San_Francisco_site", "Regular", "Full Time", "Salary", "USD", "140000", "Annual", "39905", "21440", EXT_ID);
 		List<Object> list = new ArrayList<Object>();
 		list.add(employee);
 		return list;
 	}
     
+	@SuppressWarnings("unchecked")
 	@Test
     public void testMainFlow() throws Exception {
 		Thread.sleep(10000);
@@ -133,45 +134,45 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		helper.awaitJobTermination(TIMEOUT_MILLIS * 1000, 500);
 		helper.assertJobWasSuccessful();	
 		
-		SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("getSnowRequests");
-		flow.initialise();
-		Map<String, String> inputMap = new HashMap<String, String>();
+		
+		SubflowInterceptingChainLifecycleWrapper getSnowRequestsflow = getSubFlow("getSnowRequests");
+		getSnowRequestsflow.initialise();
+		
+		// get requests from ServiceNow
+		MuleEvent response = getSnowRequestsflow.process(getTestEvent(ASSIGNED_TO, MessageExchangePattern.REQUEST_RESPONSE));
+		
+		List<Map<String, String>> snowRes = (List<Map<String, String>>) response.getMessage().getPayload();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		logger.info("Starting date: " + sdf.format(startingDate));
-		inputMap.put("sysUpdatedOn", ">" + DateUtil.applyTimeZone(startingDate, "yyyy-MM-dd HH:mm:ss", "GMT"));
-		
-		MuleEvent response = flow.process(getTestEvent(ASSIGNED_TO, MessageExchangePattern.REQUEST_RESPONSE));
-		GetRecordsResponse snowRes = ((GetRecordsResponse)response.getMessage().getPayload());
-		logger.info("Snow requests: " + snowRes.getGetRecordsResult().size());
-		
 		int count = 0;
-		for (com.servicenow.servicecatalog.screquest.GetRecordsResponse.GetRecordsResult item : snowRes.getGetRecordsResult()){
-			if (startingDate.compareTo(sdf.parse(item.getOpenedAt())) < 0){
+		for (Map<String, String> request : snowRes){
+			Date requestOpenedAtDate = sdf.parse(request.get("opened_at"));
+			
+			if (startingDate.before(requestOpenedAtDate)){
 				count++;
-				snowReqIds.add(item.getSysId());
-				List<GetRecordsResult> reqItems = getReqItem(item.getSysId());
+				snowReqIds.add(request.get("sys_id"));
+				// get request items
+				List<Map<String, String>> reqItems = getReqItem(request.get("sys_id"));
 				Assert.assertTrue("There should be 1 request item in request in ServiceNow and there is " + reqItems.size() + ".", reqItems.size() == 1);
-				for (com.servicenow.servicecatalog.screqitem.GetRecordsResponse.GetRecordsResult reqItem  : reqItems){
-					Assert.assertTrue("There should be correct catalogue item set.", 
-							reqItem.getCatItem().equals(PC_MODEL) || reqItem.getCatItem().equals(DESK_MODEL));
+				for (Map<String, String> reqItem  : reqItems){
+					Assert.assertTrue("There should be correct catalogue item set.", reqItem.get("cat_item").equals(PC_MODEL) || reqItem.get("cat_item").equals(DESK_MODEL));
 				}
 			}
 		}
-		
 		Assert.assertTrue("There should be two service requests in ServiceNow, but there are " + count + ".", count == 2);		
     }
     
-    private List<GetRecordsResult> getReqItem(String parentId) throws MuleException, Exception{
+    @SuppressWarnings("unchecked")
+	private List<Map<String, String>> getReqItem(String parentId) throws MuleException, Exception{
     	SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("getSnowReqItems");
 		flow.initialise();		
 		MuleEvent response = flow.process(getTestEvent(parentId, MessageExchangePattern.REQUEST_RESPONSE));
-		com.servicenow.servicecatalog.screqitem.GetRecordsResponse snowRes = ((com.servicenow.servicecatalog.screqitem.GetRecordsResponse)response.getMessage().getPayload());
+		List<Map<String, String>> snowRes = (List<Map<String, String>>) response.getMessage().getPayload();
 		
-		return snowRes.getGetRecordsResult();
+		return snowRes;
     }
     
     private void deleteTestDataFromSandBox() throws MuleException, Exception {
-    	logger.info("Deleting test data...");
+    	LOGGER.info("Deleting test data...");
 		
     	SubflowInterceptingChainLifecycleWrapper flow = getSubFlow("deleteRequests");
 		flow.initialise();
@@ -179,8 +180,8 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		flow1.initialise();
 		
 		for (String id : snowReqIds){			
-			flow1.process(getTestEvent(id));			
-			flow.process(getTestEvent(id));					
+			flow1.process(getTestEvent(id, MessageExchangePattern.REQUEST_RESPONSE));			
+			flow.process(getTestEvent(id, MessageExchangePattern.REQUEST_RESPONSE));					
 		}
 				
     	// Terminate the created users in Workday
@@ -195,6 +196,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
+		LOGGER.info("Deleting test data finished...");
 	}
     
     private EmployeeGetType getEmployee(){
@@ -215,7 +217,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		TerminateEmployeeRequestType req = (TerminateEmployeeRequestType) response.getMessage().getPayload();
 		TerminateEmployeeDataType eeData = req.getTerminateEmployeeData();		
 		TerminateEventDataType event = new TerminateEventDataType();
-		eeData.setTerminationDate(xmlDate(new Date()));
+		eeData.setTerminationDate(new GregorianCalendar());
 		EventClassificationSubcategoryObjectType prim = new EventClassificationSubcategoryObjectType();
 		List<EventClassificationSubcategoryObjectIDType> list = new ArrayList<EventClassificationSubcategoryObjectIDType>();
 		EventClassificationSubcategoryObjectIDType id = new EventClassificationSubcategoryObjectIDType();
@@ -228,9 +230,4 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		return req;		
 	}
 	
-	private static XMLGregorianCalendar xmlDate(Date date) throws DatatypeConfigurationException {
-		GregorianCalendar gregorianCalendar = (GregorianCalendar) GregorianCalendar.getInstance();
-		gregorianCalendar.setTime(date);
-		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
-	}	
 }
