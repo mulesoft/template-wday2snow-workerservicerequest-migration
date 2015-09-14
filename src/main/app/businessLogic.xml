@@ -98,22 +98,17 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 ---
 {
 	ns0#insert: {
-		ns0#active			: true,
-		ns0#approval		: "Requested",
-		ns0#"assigned_to"	: p('snow.pc.assignedTo'),
-		ns0#location		: p('snow.location'),
-		ns0#price			: p('snow.pc.price'),
-		ns0#dueDate			: (now + toPeriod(pcDeliveryDays)) as :date
+		ns0#active          : true,
+		ns0#approval        : "Requested",
+		ns0#"assigned_to"   : p('snow.pc.assignedTo'),
+		ns0#location        : p('snow.location'),
+		ns0#price           : p('snow.pc.price'),
+		ns0#dueDate         : (now + toPeriod(pcDeliveryDays)) as :date
 	}
 }
 ]]></dw:set-payload>
         </dw:transform-message>
         <flow-ref name="insertRequestFlow" doc:name="Call insertRequestFlow"/>
-
-<!-- 		<expression-component doc:name="add dueDate to request"><![CDATA[java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		 -->
-<!-- payload.dueDate = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.pc.deliveryDays}) * 86400000)); -->
-<!-- ]]></expression-component> -->
-
         <dw:transform-message doc:name="Prepare InsertPCItem">
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/xml
@@ -123,21 +118,18 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 ---
 {
 	ns0#insert: {
-		ns0#active: true,
-		ns0#approval: "requested",
-		ns0#"assigned_to": p('snow.pc.assignedTo'),
-		ns0#"cat_item": p('snow.pc.model'),
-		ns0#parent: payload.sysId,
-		ns0#request: payload.sysId,
-		ns0#price: p('snow.pc.price'),
-		ns0#estimatedDelivery: now + toPeriod(pcDeliveryDays)
+		ns0#active            : true,
+		ns0#approval          : "Requested",
+		ns0#"assigned_to"     : p('snow.pc.assignedTo'),
+		ns0#"cat_item"        : p('snow.pc.model'),
+		ns0#parent            : payload.sysId,
+		ns0#request           : payload.sysId,
+		ns0#price             : p('snow.pc.price'),
+		ns0#estimatedDelivery : (now + toPeriod(pcDeliveryDays)) as :date
 	}
 }
 ]]></dw:set-payload>
         </dw:transform-message>
-<!-- 		<expression-component doc:name="add estimated delivery"><![CDATA[java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		 -->
-<!-- payload.estimatedDelivery = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.pc.deliveryDays}) * 86400000)); -->
-<!-- ]]></expression-component> -->
 		<flow-ref name="insertItemFlow" doc:name="Call insertItemFlow" />
 	</sub-flow>
 	<sub-flow name="insertDeskRequest" >
@@ -150,21 +142,17 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 ---
 {
 	ns0#insert: {
-		ns0#active			: true,
-		ns0#approval		: "Requested",
-		ns0#"assigned_to"	: p('snow.desk.assignedTo'),
-		ns0#location		: p('snow.location'),
-		ns0#price			: p('snow.desk.price'),
-		ns0#dueDate			: (now + toPeriod(deskDeliveryDays)) as :date
+		ns0#active          : true,
+		ns0#approval        : "Requested",
+		ns0#"assigned_to"   : p('snow.desk.assignedTo'),
+		ns0#location        : p('snow.location'),
+		ns0#price           : p('snow.desk.price'),
+		ns0#dueDate         : (now + toPeriod(deskDeliveryDays)) as :date
 	}
 }
 ]]></dw:set-payload>
         </dw:transform-message>
         <flow-ref name="insertRequestFlow" doc:name="Call insertRequestFlow"/>
-<!-- 		<expression-component doc:name="add dueDate to request"><![CDATA[java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		 -->
-<!-- payload.dueDate = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.desk.deliveryDays}) * 86400000)); -->
-<!-- ]]></expression-component> -->
-
         <dw:transform-message doc:name="Prepare InsertDesk Item">
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/xml
@@ -174,27 +162,24 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 ---
 {
 	ns0#insert: {
-		ns0#active: true,
-		ns0#approval: "requested",
-		ns0#"assigned_to": p('snow.desk.assignedTo'),
-		ns0#"cat_item": p('snow.desk.model'),
-		ns0#request: payload.sysId,
-		ns0#parent: payload.sysId,
-		ns0#price: p('snow.desk.price'),
-		ns0#estimatedDelivery: (now + toPeriod(deskDeliveryDays)) as :date
+		ns0#active            : true,
+		ns0#approval          : "Requested",
+		ns0#"assigned_to"     : p('snow.desk.assignedTo'),
+		ns0#"cat_item"        : p('snow.desk.model'),
+		ns0#request           : payload.sysId,
+		ns0#parent            : payload.sysId,
+		ns0#price             : p('snow.desk.price'),
+		ns0#estimatedDelivery : (now + toPeriod(deskDeliveryDays)) as :date
 	}
 }
 ]]></dw:set-payload>
         </dw:transform-message>
-<!-- 		<expression-component doc:name="add estimated delivery"><![CDATA[ -->
-<!-- java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");		 -->
-<!-- payload.estimatedDelivery = df.format(new java.util.Date(System.currentTimeMillis() + new java.lang.Integer(${snow.desk.deliveryDays}) * 86400000)); -->
-<!-- ]]></expression-component> -->
 		<flow-ref name="insertItemFlow" doc:name="Call insertItemFlow" />
 	</sub-flow>
 
 	<sub-flow name="insertRequestFlow" >
         <servicenow:invoke config-ref="ServiceNow" type="sc_request||insert" doc:name="Insert Request"/>
+
         <dw:transform-message doc:name="Extract sysId">
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
@@ -208,6 +193,7 @@ sysId : payload.insertResponse.sys_id]]></dw:set-payload>
 	</sub-flow>
 	<sub-flow name="insertItemFlow" >
         <servicenow:invoke config-ref="ServiceNow" type="sc_req_item||insert" doc:name="Insert Request Item"/>
+
         <dw:transform-message doc:name="Extract sysId">
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
