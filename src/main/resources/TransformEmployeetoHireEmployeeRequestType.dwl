@@ -58,7 +58,7 @@
 								value	: stateMapping(employee.state).workdayState
 							}]
 						},
-						effectiveDate	: employee.hireDate as :date,
+						effectiveDate	: employee.hireDate as :date {class: "java.util.Calendar"},
 						municipality 	: employee.city,
 						postalCode 		: employee.zip,
 						usageData: [{
@@ -127,7 +127,7 @@
 				}
 			}
 		},	
-			hireDate: employee.hireDate as :date,
+			hireDate: employee.hireDate as :date {class: "java.util.Calendar"},
 			hireEmployeeEventData: {
 				employeeExternalIDData: {
 					externalID: [{
@@ -141,7 +141,7 @@
 			            value: 'Regular'
 			        }]
 			    },
-			    firstDayOfWork: employee.startDate as :date,
+			    firstDayOfWork: employee.startDate as :date {class: "java.util.Calendar"},
 			    hireReasonReference: {
 			    	ID: [{
 			    		type	: 'General_Event_Subcategory_ID',
