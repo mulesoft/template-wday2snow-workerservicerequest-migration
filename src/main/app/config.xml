@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule version="EE-3.7.1"
+<mule version="EE-3.7.2"
 	xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" 

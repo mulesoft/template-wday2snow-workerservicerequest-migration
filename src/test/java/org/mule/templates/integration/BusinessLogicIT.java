@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
@@ -25,12 +25,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
-import org.mule.templates.utils.DateUtil;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.templates.utils.Employee;
 
 import com.mulesoft.module.batch.BatchTestHelper;
@@ -68,6 +69,9 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 	private Employee employee;
     private List<String> snowReqIds = new ArrayList<String>();	
     
+    @Rule
+	public DynamicPort port = new DynamicPort("http.port");
+    
     @BeforeClass
     public static void beforeTestClass() {
     	
@@ -84,12 +88,14 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
     	ASSIGNED_TO = props.getProperty("snow.desk.assignedTo");
     	DESK_MODEL = props.getProperty("snow.desk.model");
     	EXT_ID = props.getProperty("wday.ext.id");
-    	Calendar cal = Calendar.getInstance();
-    	cal.add(Calendar.HOUR_OF_DAY, -1);
+    	
+    	Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    	cal.add(Calendar.MINUTE, -3);
     	startingDate = cal.getTime();
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");    	
-    	System.setProperty("migration.startDate", sdf.format(new Date()));
-    	System.setProperty("http.port", "9090");
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");    
+    	sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+    	
+    	System.setProperty("migration.startDate", sdf.format(startingDate));
     }
 
     @Before
@@ -134,7 +140,6 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		helper.awaitJobTermination(TIMEOUT_MILLIS * 1000, 500);
 		helper.assertJobWasSuccessful();	
 		
-		
 		SubflowInterceptingChainLifecycleWrapper getSnowRequestsflow = getSubFlow("getSnowRequests");
 		getSnowRequestsflow.initialise();
 		
@@ -143,6 +148,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		
 		List<Map<String, String>> snowRes = (List<Map<String, String>>) response.getMessage().getPayload();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		int count = 0;
 		for (Map<String, String> request : snowRes){
 			Date requestOpenedAtDate = sdf.parse(request.get("opened_at"));
