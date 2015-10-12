@@ -152,7 +152,7 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 + snow.desk.deliveryDays `3`
 + snow.desk.price `500`
 
-#### SMPT Services configuration
+#### SMTP Services configuration
 + smtp.host `smtp.gmail.com`
 + smtp.port `587`
 + smtp.user `sender%40gmail.com`
