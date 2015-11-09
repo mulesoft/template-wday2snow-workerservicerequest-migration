@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule version="EE-3.7.2"
-	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" 
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" 
 	xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" 
 	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" 
 	xmlns:json="http://www.mulesoft.org/schema/mule/json"
@@ -24,6 +23,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 		<batch:threading-profile poolExhaustedAction="WAIT" />
 		
 		<batch:input>
+
             <dw:transform-message doc:name="Create GetWorkers Request">
                 <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
@@ -52,6 +52,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	}
 } as :object {class: "com.workday.hr.GetWorkersRequestType"}]]></dw:set-payload>
             </dw:transform-message>
+
 			<wd-hr:get-workers config-ref="Workday_Human_Resource"
 				doc:name="Workday Human Resource - Get workers"
 				 />
