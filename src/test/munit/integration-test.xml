@@ -62,6 +62,13 @@ now - |PT1M|]]></dw:set-variable>
         </dw:transform-message>
     </munit:before-test>
     
+     <munit:after-test name="AfterTest" description="After tests actions">
+        <foreach collection="flowVars.snowRequests" doc:name="For each ServiceNow Request">
+            <logger message="Deleting request: #[payload]" level="INFO" doc:name="Log request Id to delete"/>
+            <flow-ref name="deleteSnowRequest" doc:name="deleteSnowRequest"/>
+        </foreach>
+    </munit:after-test>
+    
    <munit:test name="TestBatch" description="Test">
         <flow-ref name="hireWorkdayEmployee" doc:name="hireWorkdayEmployee"/>
         <synchronize:run-and-wait timeout="240000" doc:name="Synchronize">
@@ -80,7 +87,7 @@ payload filter isAfter(toDateTimeUTC($.'opened_at'), flowVars.start)]]></dw:set-
             <dw:set-variable variableName="snowRequests"><![CDATA[%dw 1.0
 %output application/java
 ---
-payload map $.sys_id]]></dw:set-variable>
+payload map $.'sys_id']]></dw:set-variable>
         </dw:transform-message>
         <foreach collection="flowVars.snowRequests" doc:name="For each ServiceNow Request">
             <flow-ref name="getSnowReqItems" doc:name="getSnowReqItems"/>
@@ -109,7 +116,7 @@ payload filter isAfter(toDateTimeUTC($.'opened_at'), flowVars.start)]]></dw:set-
             <dw:set-variable variableName="snowRequests"><![CDATA[%dw 1.0
 %output application/java
 ---
-payload[0].'sys_id']]></dw:set-variable>
+[ payload[0].'sys_id' ]]]></dw:set-variable>
         </dw:transform-message>
 
         <set-payload value="#[payload[0].'sys_id']" doc:name="Request Id"/>
@@ -134,7 +141,7 @@ payload filter isAfter(toDateTimeUTC($.'opened_at'), flowVars.start)]]></dw:set-
             <dw:set-variable variableName="snowRequests"><![CDATA[%dw 1.0
 %output application/java
 ---
-payload[0].'sys_id']]></dw:set-variable>
+[ payload[0].'sys_id' ]]]></dw:set-variable>
         </dw:transform-message>
         <set-payload value="#[payload[0].'sys_id']" doc:name="Request Id"/>
         <flow-ref name="getSnowReqItems" doc:name="getSnowReqItems"/>
@@ -144,12 +151,7 @@ payload[0].'sys_id']]></dw:set-variable>
     
      
     
-     <munit:after-test name="AfterTest" description="After tests actions">
-        <foreach collection="flowVars.snowRequests" doc:name="For each ServiceNow Request">
-            <logger message="Deleting request: #[payload]" level="INFO" doc:name="Log request Id to delete"/>
-            <flow-ref name="deleteSnowRequest" doc:name="deleteSnowRequest"/>
-        </foreach>
-    </munit:after-test>
+    
 
 
     <sub-flow name="hireWorkdayEmployee">

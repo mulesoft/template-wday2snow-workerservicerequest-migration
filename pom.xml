@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.mule.templates</groupId>
 		<artifactId>templates-tooling-parent-pom</artifactId>
-		<version>1.2.3</version>
+		<version>1.2.7</version>
 	</parent>
 
 	<artifactId>template-wday2snow-workerservicerequest-migration</artifactId>
