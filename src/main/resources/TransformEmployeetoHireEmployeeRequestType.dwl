@@ -1,7 +1,5 @@
 %dw 1.0
-%input payload application/java
 %output application/java
-%var employee = payload as :object {class: "com.mule.templates.utils.Employee"}
 
 %function countryMapping(inputCountry) {
 	workdayCountry: 'USA' when inputCountry == 'US' otherwise null
@@ -24,9 +22,11 @@
 	(workdayPayPlan: 'SALARY_Salary_Plan') when payRateType == 'Salary',
 	(workdayPayPlan: 'SALARY_Hourly_Plan') when payRateType == 'Hourly'
 } unless payRateType is :null otherwise workdayPayPlan: null
+
+%var extId = 'wday2snow-workerservicerequest-migration' ++ currentMillis()
 --- 
 {
-	version: 'v20',
+	version: 'v21.1',
 	businessProcessParameters : {
 		autoComplete : true
 	},
@@ -35,7 +35,7 @@
 			externalIntegrationIDData: {
 				ID: [{
 					systemID	: 'Jobvite',
-				    value		: employee.id
+				    value		: extId
 				    }]
 			},
 			personalData: {
@@ -43,24 +43,24 @@
 					addressData: [{
 						addressLineData: [{
 							type	: 'ADDRESS_LINE_1',
-							value	: employee.addr1
+							value	: p('wday.addr1')
 
 						}],
 						countryReference: {
 							ID: [{
 								type	: 'ISO_3166-1_Alpha-3_Code',
-								value	: countryMapping(employee.country).workdayCountry
+								value	: countryMapping(p('wday.country')).workdayCountry
 							}]
 						},
 						countryRegionReference: {
 							ID: [{
 								type	: 'Country_Region_ID',
-								value	: stateMapping(employee.state).workdayState
+								value	: stateMapping(p('wday.state')).workdayState
 							}]
 						},
-						effectiveDate	: employee.hireDate as :date {class: "java.util.Calendar"},
-						municipality 	: employee.city,
-						postalCode 		: employee.zip,
+						effectiveDate	: now as :date {class: "java.util.Calendar"},
+						municipality 	: p('wday.city'),
+						postalCode 		: p('wday.zip'),
 						usageData: [{
 							typeData:[{
 								primary : true,
@@ -74,7 +74,7 @@
 						}]
 					}],
 					emailAddressData 	: [{
-						emailAddress	: employee.email,
+						emailAddress	: p('wday.email'),
 						usageData: [{
 							public: true,
 							typeData: [{
@@ -96,7 +96,7 @@
 								value	: '1063.5'
 							}]
 						},
-						phoneNumber		: employee.phone,
+						phoneNumber		: p('wday.phone'),
 						usageData: [{
 							public: true,
 							typeData: [{
@@ -117,22 +117,22 @@
 							countryReference: {
 								ID: [{
 									type	: 'ISO_3166-1_Alpha-3_Code',
-									value	: countryMapping(employee.country).workdayCountry
+									value	: countryMapping(p('wday.country')).workdayCountry
 								}]
 							},
-							firstName	: employee.givenName,
-							lastName	: employee.familyName
+							firstName	: extId,
+							lastName	: p('wday.familyName')
 						}
 					}
 				}
 			}
 		},	
-			hireDate: employee.hireDate as :date {class: "java.util.Calendar"},
+			hireDate: now as :date {class: "java.util.Calendar"},
 			hireEmployeeEventData: {
 				employeeExternalIDData: {
 					externalID: [{
-						externalID: employee.id,
-						systemID: 'Salesforce - Chatter'
+						externalID: extId,
+						systemID: p('wday.ext.id')
 					}]
 				},
 				employeeTypeReference: {
@@ -141,7 +141,7 @@
 			            value: 'Regular'
 			        }]
 			    },
-			    firstDayOfWork: employee.startDate as :date {class: "java.util.Calendar"},
+			    firstDayOfWork: now as :date {class: "java.util.Calendar"},
 			    hireReasonReference: {
 			    	ID: [{
 			    		type	: 'General_Event_Subcategory_ID',
@@ -149,31 +149,31 @@
 			    	}]
 			    },
 			    positionDetails: {
-			    	positionTitle: employee.title,
+			    	positionTitle: p('wday.title'),
 			    	defaultHours: 40,
 			    	scheduledHours: 40,
 			    	jobProfileReference: {
 			    		ID: [{
 			    			type: 'Job_Profile_ID',
-			    			value: employee.jobProfile
+			    			value: p('wday.jobProfile')
 			    		}]
 			    	},
 			    	locationReference: {
 			    		ID: [{
 			    			type: 'Location_ID',
-			    			value: locationMapping(employee.location).workdayLocation
+			    			value: locationMapping(p('wday.location')).workdayLocation
 			    		}]
 			    	},
 			    	payRateTypeReference : {
 			    		ID : [{
 			    			type: 'Pay_Rate_Type_ID',
-			    			value: employee.payRateType
+			    			value: p('wday.payRateType')
 			    		}]
 			    	},
 			    	positionTimeTypeReference : {
 			    		ID : [{
 			    			type: 'Position_Time_Type_ID',
-			    			value: posTimeTypeMapping(employee.timeType).workdayPosTimeType
+			    			value: posTimeTypeMapping(p('wday.timeType')).workdayPosTimeType
 			    		}]
 			    	}
 			    }
@@ -205,29 +205,29 @@
 					},
 				payPlanData: {
 					payPlanSubData: [{
-						amount: employee.basePay,
+						amount: p('wday.basePay'),
 						currencyReference : {
 							ID : [{
 								type: 'Currency_ID',
-								value: employee.basePayCurrency
+								value: p('wday.basePayCurrency')
 							}]
 						},
 						frequencyReference : {
 							ID: [{
 								type : 'Frequency_ID',
-								value : employee.basePayFreq
+								value : p('wday.basePayFreq')
 							}]
 						},
 						payPlanReference : {
 							ID : [{
 								type : 'Compensation_Plan_ID',
-								value: payPlanMapping(employee.payRateType).workdayPayPlan
+								value: payPlanMapping(p('wday.payRateType')).workdayPayPlan
 							}]
 						}
 					}],
 					'replace' : false
 				},
-				primaryCompensationBasis : employee.basePay
+				primaryCompensationBasis : p('wday.basePay')
 				}
 			}
 		}

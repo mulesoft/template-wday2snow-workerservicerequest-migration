@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+	xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow" 
+	xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" 
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" 
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" 
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" 
+	xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" 
+	xmlns:synchronize="http://www.mulesoft.org/schema/mule/synchronize"
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" 
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:core="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/synchronize http://www.mulesoft.org/schema/mule/synchronize/current/mule-synchronize.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/mule/wd-staffing/current/mule-wd-staffing.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd
+http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <wd-staffing:config name="Workday_Staffing" staffingUser="${wday.user}" staffingPassword="${wday.password}" staffingEndpoint="${wday.endpoint}" doc:name="Workday Staffing">
+        <wd-staffing:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
+    </wd-staffing:config>
+	<munit:config name="munit" doc:name="MUnit configuration" />
+	
+	<configuration doc:name="Configuration">
+     <expression-language>
+         <global-functions>
+             def isAfter(subject, reference) {
+                 return subject.after(reference)
+             }
+             def currentMillis(){
+             	return System.currentTimeMillis()
+             }
+         </global-functions>
+     </expression-language>
+   </configuration>
+	
+	<spring:beans>
+		<spring:import resource="classpath:endpoints.xml" />
+		<spring:import resource="classpath:businessLogic.xml" />
+		<spring:import resource="classpath:config.xml" />
+		<spring:import resource="classpath:errorHandling.xml" />
+	</spring:beans>
+	
+	  <munit:before-suite name="BeforeSuite" description="MUnit Test">
+        <expression-component doc:name="migration start date"><![CDATA[System.setProperty("migration.startDate", dw('now - |PT1M| >> |+00:00| as :string {format: "yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'"}'));]]></expression-component>
+    </munit:before-suite>
+    <munit:before-test name="BeforeTest" description="Before tests actions">
+        <dw:transform-message doc:name="setup variables">
+            <dw:set-variable variableName="start"><![CDATA[%dw 1.0
+%output application/java
+---
+now - |PT1M|]]></dw:set-variable>
+        </dw:transform-message>
+    </munit:before-test>
+    
+     <munit:after-test name="AfterTest" description="After tests actions">
+        <foreach collection="flowVars.snowRequests" doc:name="For each ServiceNow Request">
+            <logger message="Deleting request: #[payload]" level="INFO" doc:name="Log request Id to delete"/>
+            <flow-ref name="deleteSnowRequest" doc:name="deleteSnowRequest"/>
+        </foreach>
+    </munit:after-test>
+    
+   <munit:test name="TestBatch" description="Test">
+        <flow-ref name="hireWorkdayEmployee" doc:name="hireWorkdayEmployee"/>
+        <synchronize:run-and-wait timeout="240000" doc:name="Synchronize">
+            <batch:execute name="createServiceNowAssets" doc:name="execute migration batch"/>
+        </synchronize:run-and-wait>
+        <flow-ref name="getSnowRequests" doc:name="getSnowRequests"/>
+        <dw:transform-message doc:name="Filter new Requests">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+%var toDateTimeUTC = (timestamp) -> ((timestamp replace /(\s)/ with "T") ++ "+00:00") as :datetime
+---
+payload filter isAfter(toDateTimeUTC($.'opened_at'), flowVars.start)]]></dw:set-payload>
+        </dw:transform-message>
+        <munit:assert-true message="There should be 2 requests" condition="#[payload.size() == 2]" doc:name="There should be 2 Requests"/>
+        <dw:transform-message doc:name="Save Request Ids">
+            <dw:set-variable variableName="snowRequests"><![CDATA[%dw 1.0
+%output application/java
+---
+payload map $.'sys_id']]></dw:set-variable>
+        </dw:transform-message>
+        <foreach collection="flowVars.snowRequests" doc:name="For each ServiceNow Request">
+            <flow-ref name="getSnowReqItems" doc:name="getSnowReqItems"/>
+            <munit:assert-true message="There should be 1 requested item for each request." condition="#[payload.size() == 1]" doc:name="There should be single Requested Item in Request"/>
+            <munit:assert-true message="There should be correct catalog item set." condition="#[payload[0].'cat_item'.equals('${snow.pc.model}') || payload[0].'cat_item'.equals('${snow.desk.model}')]" doc:name="Check catalog item is correct"/>
+        </foreach>
+        <flow-ref name="terminateWorkdayEmployee" doc:name="terminateWorkdayEmployee"/>
+    </munit:test>
+
+    <munit:test name="TestInsertPCRequest" description="MUnit Test">
+
+
+        <flow-ref name="insertPcRequest" doc:name="insertPCRequest"/>
+        <flow-ref name="getSnowRequests" doc:name="getSnowRequests"/>
+
+        <dw:transform-message doc:name="Filter new Requests">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+%var toDateTimeUTC = (timestamp) -> ((timestamp replace /(\s)/ with "T") ++ "+00:00") as :datetime
+---
+payload filter isAfter(toDateTimeUTC($.'opened_at'), flowVars.start)]]></dw:set-payload>
+        </dw:transform-message>
+
+        <munit:assert-true message="There should be single request" condition="#[payload.size() == 1]" doc:name="There should be single Request"/>
+        <dw:transform-message doc:name="Save Request Id">
+            <dw:set-variable variableName="snowRequests"><![CDATA[%dw 1.0
+%output application/java
+---
+[ payload[0].'sys_id' ]]]></dw:set-variable>
+        </dw:transform-message>
+
+        <set-payload value="#[payload[0].'sys_id']" doc:name="Request Id"/>
+        <flow-ref name="getSnowReqItems" doc:name="getSnowReqItems"/>
+        <munit:assert-true message="There should be 1 requested item for each request." condition="#[payload.size() == 1]" doc:name="There should be single Requested Item in Request"/>
+        <munit:assert-true message="There should be correct catalog item set." condition="#[payload[0].'cat_item'.equals('${snow.pc.model}')]" doc:name="Check catalog item is correct"/>
+
+    </munit:test>
+    
+    <munit:test name="TestInsertDeskRequest" description="MUnit Test">
+        <flow-ref name="insertDeskRequest" doc:name="insertDeskRequest"/>
+        <flow-ref name="getSnowRequests" doc:name="getSnowRequests"/>
+        <dw:transform-message doc:name="Filter new Requests">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+%var toDateTimeUTC = (timestamp) -> ((timestamp replace /(\s)/ with "T") ++ "+00:00") as :datetime
+---
+payload filter isAfter(toDateTimeUTC($.'opened_at'), flowVars.start)]]></dw:set-payload>
+        </dw:transform-message>
+        <munit:assert-true message="There should be single request" condition="#[payload.size() == 1]" doc:name="There should be single Request"/>
+        <dw:transform-message doc:name="Save Request Id">
+            <dw:set-variable variableName="snowRequests"><![CDATA[%dw 1.0
+%output application/java
+---
+[ payload[0].'sys_id' ]]]></dw:set-variable>
+        </dw:transform-message>
+        <set-payload value="#[payload[0].'sys_id']" doc:name="Request Id"/>
+        <flow-ref name="getSnowReqItems" doc:name="getSnowReqItems"/>
+        <munit:assert-true message="There should be 1 requested item for each request." condition="#[payload.size() == 1]" doc:name="There should be single Requested Item in Request"/>
+        <munit:assert-true message="There should be correct catalog item set." condition="#[payload[0].'cat_item'.equals('${snow.desk.model}')]" doc:name="Check catalog item is correct"/>
+    </munit:test>
+    
+     
+    
+    
+
+
+    <sub-flow name="hireWorkdayEmployee">
+        <logger message="Hiring employee..." level="INFO" doc:name="Log before hiring"/>
+
+
+        <dw:transform-message doc:name="Create HireEmployeeRequestType">
+            <dw:set-payload resource="classpath:TransformEmployeetoHireEmployeeRequestType.dwl"/>
+        </dw:transform-message>
+        <wd-staffing:hire-employee config-ref="Workday_Staffing" doc:name="Hire Employee"/>
+        <dw:transform-message doc:name="Save employee Id">
+            <dw:set-variable variableName="employeeId"><![CDATA[%dw 1.0
+%output application/java
+---
+(payload.employeeReference.ID filter $.type == 'Employee_ID')[0].value]]></dw:set-variable>
+        </dw:transform-message>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <logger message="HireEmployee flow finished. #[payload]" level="INFO" doc:name="Log after hiring"/>
+        <expression-component doc:name="Delay"><![CDATA[Thread.sleep(10000);]]></expression-component>
+    </sub-flow>
+    <sub-flow name="terminateWorkdayEmployee">
+
+
+        <dw:transform-message doc:name="Create TerminateEmployeeRequestType">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+	version					: 'v21.1',
+	terminateEmployeeData 	: {
+		terminationDate		: now as :date,
+		terminateEventData  : {
+			primaryReasonReference: {
+				ID: [{
+					type: "WID",
+					value: p('wday.termination.id')
+				}]
+			}
+		},
+		employeeReference	: {
+			ID				: [{
+				type		: "Employee_ID",
+				value		: flowVars.employeeId
+			}]
+		}
+	}
+} as :object {class: "com.workday.staffing.TerminateEmployeeRequestType"}
+]]></dw:set-payload>
+        </dw:transform-message>
+        <wd-staffing:terminate-employee config-ref="Workday_Staffing" doc:name="Terminate Employee"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <logger message="Workday terminate flow: #[payload]" level="INFO" doc:name="Log after Employee termination"/>
+    </sub-flow>
+    <sub-flow name="getSnowRequests">
+        <dw:transform-message doc:name="Create request">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 http://www.service-now.com/sc_request
+---
+{
+	ns0#getRecords: {
+		ns0#"assigned_to" : p('snow.desk.assignedTo')
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <servicenow:invoke config-ref="ServiceNow" type="sc_request||getRecords" doc:name="Get Requests"/>
+        <dw:transform-message doc:name="XML to Java">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload.getRecordsResponse.*getRecordsResult when payload.getRecordsResponse is :object otherwise []]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="Requests: #[payload]" level="INFO" doc:name="Log retrieved Requests"/>
+    </sub-flow>
+    <sub-flow name="getSnowReqItems">
+        <dw:transform-message doc:name="Create request">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 http://www.service-now.com/sc_req_item
+---
+{
+	ns0#getRecords: {
+		ns0#parent: payload
+		}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <servicenow:invoke config-ref="ServiceNow" type="sc_req_item||getRecords" doc:name="Get Requested Items"/>
+        <dw:transform-message doc:name="XML to Java">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload.getRecordsResponse.*getRecordsResult when payload.getRecordsResponse is :object otherwise []]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="Requested Items: #[payload]" level="INFO" doc:name="Log retrieved Requested Items"/>
+    </sub-flow>
+    <sub-flow name="deleteSnowRequest">
+
+        <dw:transform-message doc:name="Create request">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 http://www.service-now.com/sc_request
+---
+{
+	ns0#deleteRecord: {
+		ns0#sys_id: payload
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <servicenow:invoke config-ref="ServiceNow" type="sc_request||deleteRecord" doc:name="Delete Request"/>
+        <dw:transform-message doc:name="XML to Java">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="deleteSnowRequests response: #[payload]" level="INFO" doc:name="Log delete response"/>
+    </sub-flow>
+
+    
+   
+
+  
+
+</mule>
