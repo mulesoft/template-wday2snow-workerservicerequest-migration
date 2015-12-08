@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+<mule xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" 
 	xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow" 
 	xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" 
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" 
