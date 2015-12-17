@@ -37,6 +37,8 @@ During the Input stage the Anypoint Template will query Workday for all the exis
 The Process stage will create new service request assigned to the concrete item - desk or computer in Service Now for each worker.
 Finally, during the On Complete stage the Anypoint Template will print output statistics data into the console and send a notification email with the result of the batch execution.
 
+The template is covered by the integration tests using the [MUnit](https://docs.mulesoft.com/mule-user-guide/v/3.7/munit). To be able to run the tests, see the example configuration of the test property file.
+
 # Considerations <a name="considerations"/>
 
 There are a couple of things you should take into account before running this Anypoint Template:
@@ -162,6 +164,60 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 + mail.from `users.report%40mulesoft.com`
 + mail.to `user@mulesoft.com`
 + mail.subject `Workers Migration Report`
+
+### MUnit configuration
+Http Test Connector configuration
++ http.port `9090`
+
+WorkDay Test Connector configuration
++ wday.user `admin@workday`
++ wday.password `secret`
++ wday.endpoint `https://impl-cc.workday.com/ccx/service/workday/Human_Resources/v21.1`
+
+WorkDay Test Data
++ wday.termination.id `208082cd7b66463e801d95ffdc77461b`
++ wday.ext.id `Salesforce - Chatter`
++ wday.familyName `Phill`
++ wday.email `emailtest@gmailtest.com`
++ wday.phone `650-555-2323`
++ wday.addr1 `999 Main St`
++ wday.city `San Francisco`
++ wday.state `CA`
++ wday.zip `94105`
++ wday.country `US`
++ wday.title `QA Engineer`
++ wday.location `San_Francisco_site`
++ wday.eeType `Regular`
++ wday.timeType `Full Time`
++ wday.payRateType `Salary`
++ wday.basePayCurrency `USD`
++ wday.basePay `140000`
++ wday.basePayFreq `Annual`
++ wday.jobProfile `40405`
+
+ServiceNow Test Connector
++ snow.user `snow_user1`
++ snow.password `ExamplePassword881`
++ snow.endpoint `https://instance.service-now.com`
+
+ServiceNow Items configuration
++ snow.pc.assignedTo `sysId_of_the_ServiceNow_User`
++ snow.pc.model `sysId_of_the_ServiceNow_Item1`
++ snow.desk.assignedTo `sysId_of_the_ServiceNow_User`
++ snow.desk.model `sysId_of_the_ServiceNow_Item2`
++ snow.location `sysId_of_the_ServiceNow_Location`
+
++ snow.pc.deliveryDays `5`
++ snow.pc.price `3000`
+
++ snow.desk.deliveryDays `3`
++ snow.desk.price `500`
+
+SMTP Services configuration
++ smtp.host `smtp.gmail.com`
++ smtp.port `587`
++ smtp.user `sender%40gmail.com`
++ smtp.password `secret`
 
 # API Calls <a name="apicalls"/>
 There are no special considerations regarding API calls.
