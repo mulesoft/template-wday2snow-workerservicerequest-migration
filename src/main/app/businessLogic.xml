@@ -82,7 +82,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
                     <logger message="Migration process has finished: #[payload]" level="INFO" doc:name="Log 'Migration process has finished'"/>
                 </processor-chain>
                 <processor-chain>
-                    <parse-template location="./src/main/resources/email/body.html" doc:name="Parse Template"/>
+                    <parse-template location="email/body.html" doc:name="Parse Template"/>
                     <smtp:outbound-endpoint host="${smtp.host}" port="${smtp.port}" user="${smtp.user}" password="${smtp.password}" connector-ref="gmailConnector" to="${mail.to}" from="${mail.from}" subject="${mail.subject}" responseTimeout="10000" doc:name="Send mail"/>
                 </processor-chain>
 
