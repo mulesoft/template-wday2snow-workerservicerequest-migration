@@ -10,7 +10,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	<flow name="triggerFlow" doc:id="25a15396-5def-4f1c-bac2-6c7a769f4278">
 		<http:listener doc:name="Start synchronization"
 			doc:id="ca1efe4f-1e53-428a-b439-c1d905246a34" config-ref="HTTP_Listener_config"
-			path="/migrateworkers" />
+			path="/migrate" />
 		<flow-ref doc:name="mainFlow" doc:id="9c665dd4-7df3-4e0d-a1eb-01ac63781ce7"
 			name="mainFlow" />
 		<ee:transform doc:name="Build response"
