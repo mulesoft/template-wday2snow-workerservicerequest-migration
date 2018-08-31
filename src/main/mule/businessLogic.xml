@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:workday="http://www.mulesoft.org/schema/mule/workday"
+	xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd
+http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd">
+
+
+
+	<flow name="businessLogicFlow" doc:id="884f86c5-66e1-4701-bb9b-594c2a60abf3">
+		<ee:transform doc:name="Create GetWorkers Request"
+			doc:id="b108aeb5-99e7-4ecb-90c2-db75ac6a8034">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:com.workday/bsvc
+---
+{
+    ns0#Get_Workers_Request: {
+        ns0#Request_Criteria: {
+            
+            ns0#Exclude_Inactive_Workers : true,
+            ns0#Exclude_Contingent_Workers : false,
+            ns0#Exclude_Employees : false,   
+            ns0#Transaction_Log_Criteria_Data: [{
+                ns0#Transaction_Date_Range_Data: {
+                    ns0#Updated_From: p('migration.startDate'),
+                    ns0#Updated_Through: now() - |PT6S|
+                }
+            }]
+        },        
+        ns0#Response_Group: {
+            ns0#Include_Roles : true,
+            ns0#Include_Personal_Information: true,
+            ns0#Include_Employment_Information: true,
+            ns0#Include_Reference : true
+        }
+    }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<workday:invoke service="Human_Resources" operation="Get_Workers"
+			doc:id="c85997c7-383e-4c98-a7a1-11c538f72231" config-ref="Workday_Config"
+			doc:name="Workday Human Resource - Get workers" />
+		<ee:transform doc:name="Extract a list of Workers"
+			doc:id="00cd4ae4-db72-45ff-b337-bb539efb7988">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (payload.body.Get_Workers_Response.Response_Data == null)  null else payload.body.Get_Workers_Response.Response_Data]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<batch:job jobName="migrateObjectsBatch" doc:id="79b373e6-1aeb-43a9-9dfe-8ac0d2f31fdc" blockSize="${page.size}">
+			<batch:process-records>
+				<batch:step name="insertPcRequest" doc:id="232087de-e311-49c1-a890-439c65ea1af2">
+					<flow-ref doc:name="Call insertPcRequest" doc:id="f1091457-aca4-424a-9121-33aebda25b14"
+						name="insertPcRequest" />
+				</batch:step>
+				<batch:step name="insertDeskRequest" doc:id="78a74ab4-9b91-416d-985a-acda2ac377eb">
+					<flow-ref doc:name="Call insertDeskRequest" doc:id="8a08a5f8-f6b6-4cb0-aafb-15f46f4810a1"
+						name="insertDeskRequest" />
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete>
+				<scatter-gather doc:name="Scatter-Gather"
+					doc:id="ef2964ef-0b85-4c6c-a5ee-b834df639e7b">
+					<route>
+						<logger level="INFO" doc:name="Migration process has finished!"
+							doc:id="b7575d38-7dbd-4602-9186-1bbb25234896" message="Migration process has finished!" />
+					</route>
+					<route>
+						<ee:transform doc:name="Prepare migration result email"
+							doc:id="c84b4bc4-5a65-41c1-9d0c-f1ebd3d8db7a">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+ output text/plain
+ ---
+ "Migration Report: \n"
+
+ ++ "\n Time [milliseconds]: " 		++ payload.elapsedTimeInMillis
+ ++ "\n Total Records: "				++ payload.totalRecords
+ ++ "\n Successful Records: "		++ payload.successfulRecords
+ ++ "\n Failed Records: "			++ payload.failedRecords
+ ++ "\n Loaded Records: "			++ payload.loadedRecords
+ ++ "\n Processed Records: " 		++ payload.processedRecords]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<email:send config-ref="Gmail_SMTP" doc:name="Send migration result email"
+							doc:id="5896eaa9-dd10-47a2-a6fc-6319b11dbd06" fromAddress="${mail.from}"
+							subject="${mail.subject}">
+							<email:to-addresses>
+								<email:to-address value="${mail.to}" />
+							</email:to-addresses>
+						</email:send>
+					</route>
+				</scatter-gather>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+	<flow name="mainFlow" doc:id="7c0a5bef-b3d5-442f-bff3-10d038f69a5e">
+		<flow-ref doc:name="businessLogicFlow" doc:id="91360ede-4d71-44c7-9b64-8ee762e04ea0"
+			name="businessLogicFlow" />
+		<error-handler>
+			<on-error-propagate enableNotifications="true"
+				logException="true" doc:name="On Error Propagate" doc:id="488b507d-e26c-4c56-8759-8bb4f6645d71"
+				type="ANY">
+				<flow-ref doc:name="errorHandlingFlow" doc:id="afdaf73c-0137-4d60-84f6-5c41234771a3"
+					name="errorHandlingFlow" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+
+	<flow name="insertPcRequest" doc:id="ed0bf40b-11e3-4167-98d1-71872b8a9feb">
+		<ee:transform doc:name="Prepare InsertPC Request"
+			doc:id="ea006711-1a78-40d9-b99e-17ad4780257a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/sc_request
+var pcDeliveryDays = p('snow.pc.deliveryDays')
+var toPeriod = (days) -> "PT$(24*days)H" as Period
+---
+{
+	ns0#insert: {
+		ns0#active          : true,
+		ns0#approval        : "Requested",
+		ns0#"assigned_to"   : p('snow.pc.assignedTo'),
+		ns0#location        : p('snow.location'),
+		ns0#price           : p('snow.pc.price'),
+		ns0#dueDate         : (now() + toPeriod(pcDeliveryDays)) as Date
+	}
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Call insertRequestFlow" doc:id="f1091457-aca4-424a-9121-33aebda25b14"
+			name="insertRequestFlow" />
+		<ee:transform doc:name="Prepare InsertPC Item"
+			doc:id="93584ae6-7bc1-46a9-b4e9-4c05e01b8d48">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/sc_req_item
+var pcDeliveryDays = p('snow.pc.deliveryDays')
+var toPeriod = (days) -> "PT$(24*days)H" as Period
+---
+{
+	ns0#insert: {
+		ns0#active            : true,
+		ns0#approval          : "Requested",
+		ns0#"assigned_to"     : p('snow.pc.assignedTo'),
+		ns0#"cat_item"        : p('snow.pc.model'),
+		ns0#parent            : payload.sysId,
+		ns0#request           : payload.sysId,
+		ns0#price             : p('snow.pc.price'),
+		ns0#estimatedDelivery : (now() + toPeriod(pcDeliveryDays)) as Date
+	}
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Call insertItemFlow" doc:id="0cde9fb3-124e-4a5d-921d-6da1a872041d"
+			name="insertItemFlow" />
+	</flow>
+
+	<flow name="insertDeskRequest" doc:id="ed0bf40b-11e3-4167-98d1-71872b8a9feb">
+		<ee:transform doc:name="Prepare InsertDesk Request"
+			doc:id="ea006711-1a78-40d9-b99e-17ad4780257a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/sc_request
+var deskDeliveryDays = p('snow.desk.deliveryDays')
+var toPeriod = (days) -> "PT$(24*days)H" as Period
+---
+{
+	ns0#insert: {
+		ns0#active          : true,
+		ns0#approval        : "Requested",
+		ns0#"assigned_to"   : p('snow.desk.assignedTo'),
+		ns0#location        : p('snow.location'),
+		ns0#price           : p('snow.desk.price'),
+		ns0#dueDate         : (now() + toPeriod(deskDeliveryDays)) as Date
+	}
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Call insertRequestFlow" doc:id="f1091457-aca4-424a-9121-33aebda25b14"
+			name="insertRequestFlow" />
+		<ee:transform doc:name="Prepare InsertPC Item"
+			doc:id="93584ae6-7bc1-46a9-b4e9-4c05e01b8d48">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/sc_req_item
+var deskDeliveryDays = p('snow.desk.deliveryDays')
+var toPeriod = (days) -> "PT$(24*days)H" as Period
+---
+{
+	ns0#insert: {
+		ns0#active            : true,
+		ns0#approval          : "Requested",
+		ns0#"assigned_to"     : p('snow.desk.assignedTo'),
+		ns0#"cat_item"        : p('snow.desk.model'),
+		ns0#parent            : payload.sysId,
+		ns0#request           : payload.sysId,
+		ns0#price             : p('snow.desk.price'),
+		ns0#estimatedDelivery : (now() + toPeriod(deskDeliveryDays)) as Date
+	}
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Call insertItemFlow" doc:id="0cde9fb3-124e-4a5d-921d-6da1a872041d"
+			name="insertItemFlow" />
+	</flow>
+
+
+	<flow name="insertRequestFlow" doc:id="ed0bf40b-11e3-4167-98d1-71872b8a9feb">
+		<servicenow:invoke service="sc_request" operation="insert"
+			doc:name="Insert Request" doc:id="24e8ddbe-b6bd-405a-9ae7-5d8883f58118"
+			config-ref="ServiceNow_Config" />
+		<ee:transform doc:name="Exctract sysId"
+			doc:id="b6d99a2b-bb1a-4e59-b28b-0af7eab9dbce">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	sysId : payload.body.insertResponse.sys_id,
+	number : payload.body.insertResponse.number
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Log the insert response"
+			doc:id="801de7ba-99ef-4ea4-9cb6-0ce9bd3a2534" message="request: #[payload]" />
+	</flow>
+	<flow name="insertItemFlow" doc:id="e50e08bf-39a8-4018-8e79-4dc8f71d64f6">
+		<servicenow:invoke operation="insert" doc:name="Insert Request Item"
+			doc:id="45b84e51-40a8-45f7-9c85-29a54cc594c8" config-ref="ServiceNow_Config"
+			service="sc_req_item" />
+		<ee:transform doc:name="Extract sysId"
+			doc:id="b002ff24-7b9c-4b3a-bd25-a92418714792">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	sysId : payload.body.insertResponse.sys_id,
+	number : payload.body.insertResponse.number
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Log the insert respone"
+			doc:id="7fad0bb1-39b6-49c6-8e1b-1219be5b4585" message="request item: #[payload]" />
+	</flow>
+</mule>
+
+
+        
