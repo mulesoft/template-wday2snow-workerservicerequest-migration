@@ -137,7 +137,7 @@ var toPeriod = (days) -> "PT$(24*days)H" as Period
 		ns0#"assigned_to"   : p('snow.pc.assignedTo'),
 		ns0#location        : p('snow.location'),
 		ns0#price           : p('snow.pc.price'),
-		ns0#dueDate         : (now() + toPeriod(pcDeliveryDays)) as Date
+		ns0#due_date         : (now() + toPeriod(pcDeliveryDays)) as Date
 	}
 }
 ]]></ee:set-payload>
@@ -163,7 +163,7 @@ var toPeriod = (days) -> "PT$(24*days)H" as Period
 		ns0#parent            : payload.sysId,
 		ns0#request           : payload.sysId,
 		ns0#price             : p('snow.pc.price'),
-		ns0#estimatedDelivery : (now() + toPeriod(pcDeliveryDays)) as Date
+		ns0#estimated_delivery : (now() + toPeriod(pcDeliveryDays)) as Date
 	}
 }
 ]]></ee:set-payload>
@@ -190,7 +190,7 @@ var toPeriod = (days) -> "PT$(24*days)H" as Period
 		ns0#"assigned_to"   : p('snow.desk.assignedTo'),
 		ns0#location        : p('snow.location'),
 		ns0#price           : p('snow.desk.price'),
-		ns0#dueDate         : (now() + toPeriod(deskDeliveryDays)) as Date
+		ns0#due_date         : (now() + toPeriod(deskDeliveryDays)) as Date
 	}
 }
 ]]></ee:set-payload>
@@ -216,7 +216,7 @@ var toPeriod = (days) -> "PT$(24*days)H" as Period
 		ns0#parent            : payload.sysId,
 		ns0#request           : payload.sysId,
 		ns0#price             : p('snow.desk.price'),
-		ns0#estimatedDelivery : (now() + toPeriod(deskDeliveryDays)) as Date
+		ns0#estimated_delivery : (now() + toPeriod(deskDeliveryDays)) as Date
 	}
 }
 ]]></ee:set-payload>
