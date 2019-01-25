@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:workday="http://www.mulesoft.org/schema/mule/workday"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config name="test-suite.xml" />
+	<configuration-properties doc:name="Configuration properties"
+		doc:id="73eb7f68-ae5b-4537-827c-d69d8f3043c9" file="mule.test.properties" />
+	<munit:before-test name="test-suiteBefore_Test"
+		description="Before tests actions" doc:id="444caf26-bc31-4080-b99b-2d39132dab82">
+		<ee:transform doc:name="Prepare common testing data"
+			doc:id="6f264844-25ea-46e8-9adf-cda307be3913">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="testPcRequest" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"assigned_to"   : p('snow.pc.assignedTo'),
+	location        : p('snow.location'),
+	price           : p('snow.pc.price')	
+}]]></ee:set-variable>
+				<ee:set-variable variableName="testPcItem" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"assigned_to"   : p('snow.pc.assignedTo'),
+	"cat_item"  	: p('snow.pc.model'),
+	price           : p('snow.pc.price')	
+}]]></ee:set-variable>
+				<ee:set-variable variableName="testDeskRequest" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"assigned_to"   : p('snow.desk.assignedTo'),
+	location        : p('snow.location'),
+	price           : p('snow.desk.price')	
+}]]></ee:set-variable>
+				<ee:set-variable variableName="testDeskItem" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"assigned_to"   : p('snow.desk.assignedTo'),
+	"cat_item"  	: p('snow.desk.model'),
+	price           : p('snow.desk.price')	
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		
+		<munit-tools:mock-when doc:name="Mock email processor to avoid sending email"
+			doc:id="f70c5786-4e46-4529-9cdf-85b875f9dbcd" processor="email:send">
+			<munit-tools:then-return />
+		</munit-tools:mock-when>
+	</munit:before-test>
+	<munit:test name="test-suiteTest" description="MUnit Test"
+		doc:id="d9b99079-7d37-49e0-ab3e-0da59aa105db">
+		<munit:execution>
+			<flow-ref doc:name="queryFlow" doc:id="a3c71b06-712f-4c7f-acf2-382c88762b82" 
+				name="queryFlow"/>
+			<ee:transform doc:name="Filter for only two records" doc:id="8b50aae3-39c7-4551-b2a7-8e7dd1ff896d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	"Worker" : payload[0]
+},
+{
+	"Worker" : payload[1]
+}]]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<set-variable value="#[sizeOf(payload)]" doc:name="Set number of records" doc:id="2805c3be-59a5-4c1d-a5ca-6a8bcb121ccc" variableName="numberOfRecords"/>
+			<flow-ref doc:name="Flow-ref to businessLogicFlow" doc:id="20701d84-a725-441d-98de-fa4dc2c417e3" 
+				name="businessLogicFlow"/>
+			<scripting:execute engine="groovy"
+				doc:name="Sleep for 30s until the processing is completed" doc:id="9e2b6ce2-11a8-4c76-a1e4-c910faf8efa7">
+				<scripting:code>sleep(30000)</scripting:code>
+			</scripting:execute>
+			<flow-ref doc:name="checkRequests" doc:id="ffc9f787-1961-48c0-9a12-b5fddc6a42b3" name="checkRequests"/>
+			<flow-ref doc:name="checkItems" doc:id="7e86223a-3bd6-461e-8943-2933afe53e7f" name="checkItems" />
+
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Check number of PC Requests" doc:id="226ee04b-baef-45f6-b26f-8f66bfa5e748" expression="#[vars.numberOfRecords]" is="#[MunitTools::equalTo(vars.numberOfPcRequests)]" />
+			<munit-tools:assert-that doc:name="Check number of Desk Requests"
+				doc:id="ebe0d750-7ae2-4dd2-ae48-c6670b79976a" expression="#[vars.numberOfRecords]"
+				is="#[MunitTools::equalTo(vars.numberOfDeskRequests)]" />
+			<munit-tools:assert-that doc:name="Check number of PC Items" doc:id="1e4888ab-5068-4398-8f99-c2d8d5ecd78b" expression="#[vars.numberOfRecords]" is="#[MunitTools::equalTo(vars.numberOfPcItems)]" />
+			<munit-tools:assert-that doc:name="Check number of Desk Items" doc:id="cda71df7-81cf-4eb9-b444-7d8277d1b013" expression="#[vars.numberOfRecords]" is="#[MunitTools::equalTo(vars.numberOfDeskItems)]" />
+		</munit:validation>
+	</munit:test>
+
+	<sub-flow name="checkRequests" doc:id="a4eb897e-9a35-4e43-8553-62b8fa288dff" >
+		<ee:transform doc:name="Query for PC Request" doc:id="b378b4cc-3c76-4f82-b057-699cc87718ac">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/sys_user
+---
+{
+	ns0#getRecords: {
+		ns0#"assigned_to"   : vars.testPcRequest.assigned_to,
+		ns0#location        : vars.testPcRequest.location
+	
+	}
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+				</ee:variables>
+			</ee:transform>
+		<servicenow:invoke doc:name="getRecords PC request" doc:id="ea7cc6f3-dbe0-47d4-bc70-e7a1886bbfc8" config-ref="ServiceNow_Config" service="sc_request" operation="getRecords" />
+		<set-variable value="#[sizeOf(payload.body.getRecordsResponse)]" doc:name="Number of PC requests" doc:id="55682bed-752e-4e3a-be5f-b3686ba38308" variableName="numberOfPcRequests"/>
+		<ee:transform doc:name="Save Ids to SnowIds variable and query for desk Request" doc:id="d427ff64-fe36-4e8d-8716-6ea678419174">
+			<ee:message>
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/sys_user
+---
+{
+	ns0#getRecords: {
+		ns0#"assigned_to"   : vars.testDeskRequest.assigned_to,
+		ns0#location        : vars.testDeskRequest.location
+	
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="SnowIds"><![CDATA[%dw 2.0
+output application/java
+---
+[payload.body.getRecordsResponse[0]."sys_id",payload.body.getRecordsResponse[1]."sys_id" ]
+
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<servicenow:invoke service="sc_request" operation="getRecords" doc:name="getRecords Desk request" doc:id="ab2d183f-f7cf-4af3-9919-705b0e538c9d" config-ref="ServiceNow_Config" />
+		<set-variable value="#[sizeOf(payload.body.getRecordsResponse)]" doc:name="Number of Desk requests" doc:id="b8c92eab-ecda-4c3a-9f65-38a58b173ac9" variableName="numberOfDeskRequests" />
+		<set-variable value='#[vars.SnowIds + payload.body.getRecordsResponse[0]."sys_id" + payload.body.getRecordsResponse[1]."sys_id"]' doc:name="Update SnowIds" doc:id="85115bb4-f5eb-47d3-88ff-2318a7114477" variableName="SnowIds"/>
+	</sub-flow>
+
+	<sub-flow name="checkItems" doc:id="a013395f-5206-41ee-b854-a02493387ff4" >
+		<ee:transform doc:name="Query for PC Item" doc:id="26653486-353d-4a71-b5fb-2b9dde1aa9c0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/sys_user
+---
+{
+	ns0#getRecords: {
+		ns0#"assigned_to"   : vars.testPcItem.assigned_to,
+		ns0#"cat_item"  	: vars.testPcItem.cat_item,
+		ns0#price           : vars.testPcItem.price
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables />
+		</ee:transform>
+		<servicenow:invoke service="sc_req_item" operation="getRecords" doc:name="getRecords PC item" doc:id="57c4c086-faa7-467a-a735-d2a702883308" config-ref="ServiceNow_Config" />
+		<set-variable value="#[sizeOf(payload.body.getRecordsResponse)]" doc:name="Number of PC items" doc:id="d6efd5ca-fb34-4fb7-b481-67438c0b61ec" variableName="numberOfPcItems" />
+		<ee:transform doc:name="Query for Desk Item" doc:id="3466cda8-f709-4d26-a976-5090fd7700cc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/sys_user
+---
+{
+	ns0#getRecords: {
+		ns0#"assigned_to"   : vars.testPcItem.assigned_to,
+		ns0#"cat_item"  	: vars.testPcItem.cat_item,
+		ns0#price           : vars.testPcItem.price
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables />
+		</ee:transform>
+		<servicenow:invoke service="sc_req_item" operation="getRecords" doc:name="getRecords Desk item" doc:id="92847b11-0ad6-4b65-a0aa-e2d12616ec28" config-ref="ServiceNow_Config" />
+		<set-variable value="#[sizeOf(payload.body.getRecordsResponse)]" doc:name="Number of Desk items" doc:id="a7fecebb-14fb-4b32-96c9-fa39dc811b7b" variableName="numberOfDeskItems" />
+	</sub-flow>
+
+			<munit:after-test name="test-suiteAfter_Test"
+		description="After tests actions" doc:id="5749f7ed-6485-4ac4-99e3-34757be44e64">
+		<foreach doc:name="For Each" doc:id="2fd34ecf-0fe1-48d8-920e-e6425438d602" collection="#[vars.SnowIds]">
+			<ee:transform doc:name="Query for delete request records" doc:id="b6ffaef3-3e7e-46f9-b028-c419b9bf85fd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.service-now.com/sys_user
+---
+{
+	ns0#deleteRecord: {
+		ns0#"sys_id"   : payload
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+					<ee:set-variable variableName="savePayload" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+				</ee:variables>
+		</ee:transform>
+			<servicenow:invoke service="sc_request" doc:name="Delete snow records" doc:id="3bacacb2-fa82-40ac-9659-d8b703b944ab" config-ref="ServiceNow_Config" operation="deleteRecord" />
+		</foreach>
+		
+	</munit:after-test>
+
+</mule>
