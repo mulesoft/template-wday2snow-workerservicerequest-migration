@@ -17,49 +17,7 @@ http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/
 
 
 	<flow name="businessLogicFlow" doc:id="884f86c5-66e1-4701-bb9b-594c2a60abf3">
-		<ee:transform doc:name="Create GetWorkers Request"
-			doc:id="b108aeb5-99e7-4ecb-90c2-db75ac6a8034">
-			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/xml
-ns ns0 urn:com.workday/bsvc
----
-{
-    ns0#Get_Workers_Request: {
-        ns0#Request_Criteria: {
-            
-            ns0#Exclude_Inactive_Workers : true,
-            ns0#Exclude_Contingent_Workers : false,
-            ns0#Exclude_Employees : false,   
-            ns0#Transaction_Log_Criteria_Data: [{
-                ns0#Transaction_Date_Range_Data: {
-                    ns0#Updated_From: p('migration.startDate'),
-                    ns0#Updated_Through: now() - |PT6S|
-                }
-            }]
-        },        
-        ns0#Response_Group: {
-            ns0#Include_Roles : true,
-            ns0#Include_Personal_Information: true,
-            ns0#Include_Employment_Information: true,
-            ns0#Include_Reference : true
-        }
-    }
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<workday:invoke service="Human_Resources" operation="Get_Workers"
-			doc:id="c85997c7-383e-4c98-a7a1-11c538f72231" config-ref="Workday_Config"
-			doc:name="Workday Human Resource - Get workers" />
-		<ee:transform doc:name="Extract a list of Workers"
-			doc:id="00cd4ae4-db72-45ff-b337-bb539efb7988">
-			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-if (payload.body.Get_Workers_Response.Response_Data == null)  null else payload.body.Get_Workers_Response.Response_Data]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
+
 		<batch:job jobName="migrateObjectsBatch" doc:id="79b373e6-1aeb-43a9-9dfe-8ac0d2f31fdc" blockSize="${page.size}">
 			<batch:process-records>
 				<batch:step name="insertPcRequest" doc:id="232087de-e311-49c1-a890-439c65ea1af2">
@@ -108,8 +66,10 @@ if (payload.body.Get_Workers_Response.Response_Data == null)  null else payload.
 		</batch:job>
 	</flow>
 	<flow name="mainFlow" doc:id="7c0a5bef-b3d5-442f-bff3-10d038f69a5e">
+		<flow-ref doc:name="queryFlow" doc:id="d5bf72c8-9ef1-4c36-ac82-cb11b9f02d2c" name="queryFlow" />
 		<flow-ref doc:name="businessLogicFlow" doc:id="91360ede-4d71-44c7-9b64-8ee762e04ea0"
 			name="businessLogicFlow" />
+		
 		<error-handler>
 			<on-error-propagate enableNotifications="true"
 				logException="true" doc:name="On Error Propagate" doc:id="488b507d-e26c-4c56-8759-8bb4f6645d71"
@@ -120,6 +80,49 @@ if (payload.body.Get_Workers_Response.Response_Data == null)  null else payload.
 		</error-handler>
 	</flow>
 
+	<sub-flow name="queryFlow" doc:id="dd99112c-dffb-4fa8-9648-08940fc41b4e" >
+			<ee:transform doc:name="Create GetWorkers Request"
+			doc:id="e52d03ef-b572-4944-bbe8-93d70d463068">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:com.workday/bsvc
+---
+{
+    ns0#Get_Workers_Request: {
+        ns0#Request_Criteria: {
+            
+            ns0#Exclude_Inactive_Workers : true,
+            ns0#Exclude_Contingent_Workers : false,
+            ns0#Exclude_Employees : false,   
+            ns0#Transaction_Log_Criteria_Data: [{
+                ns0#Transaction_Date_Range_Data: {
+                    ns0#Updated_From: p('migration.startDate'),
+                    ns0#Updated_Through: now() - |PT6S|
+                }
+            }]
+        },        
+        ns0#Response_Group: {
+            ns0#Include_Roles : true,
+            ns0#Include_Personal_Information: true,
+            ns0#Include_Employment_Information: true,
+            ns0#Include_Reference : true
+        }
+    }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<workday:human-resources operation="Get_Workers" doc:name="Human resources" doc:id="a8ec0579-724b-468c-ab62-fac84ef5719f" config-ref="Workday_Config_version_30" />
+		<ee:transform doc:name="Extract a list of Workers"
+			doc:id="5a58df8e-a294-443e-a205-565002d91050">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (payload.Get_Workers_Response.Response_Data == null)  null else payload.Get_Workers_Response.Response_Data]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
 	<flow name="insertPcRequest" doc:id="ed0bf40b-11e3-4167-98d1-71872b8a9feb">
 		<ee:transform doc:name="Prepare InsertPC Request"
 			doc:id="ea006711-1a78-40d9-b99e-17ad4780257a">
