@@ -93,12 +93,12 @@ output application/java
 
 		</munit:execution>
 		<munit:validation>
-			<munit-tools:assert-that doc:name="Check number of PC Requests" doc:id="226ee04b-baef-45f6-b26f-8f66bfa5e748" expression="#[vars.numberOfRecords]" is="#[MunitTools::equalTo(vars.numberOfPcRequests)]" />
+			<munit-tools:assert-that doc:name="Check number of PC Requests" doc:id="226ee04b-baef-45f6-b26f-8f66bfa5e748" expression="#[vars.numberOfRecords]" is="#[MunitTools::equalTo(vars.numberOfPcRequests)]" message="NumberOfRecords should be equal with numberOfPcRequests"/>
 			<munit-tools:assert-that doc:name="Check number of Desk Requests"
 				doc:id="ebe0d750-7ae2-4dd2-ae48-c6670b79976a" expression="#[vars.numberOfRecords]"
-				is="#[MunitTools::equalTo(vars.numberOfDeskRequests)]" />
-			<munit-tools:assert-that doc:name="Check number of PC Items" doc:id="1e4888ab-5068-4398-8f99-c2d8d5ecd78b" expression="#[vars.numberOfRecords]" is="#[MunitTools::equalTo(vars.numberOfPcItems)]" />
-			<munit-tools:assert-that doc:name="Check number of Desk Items" doc:id="cda71df7-81cf-4eb9-b444-7d8277d1b013" expression="#[vars.numberOfRecords]" is="#[MunitTools::equalTo(vars.numberOfDeskItems)]" />
+				is="#[MunitTools::equalTo(vars.numberOfDeskRequests)]" message="NumberOfRecords should be equal with numberOfDeskRequests"/>
+			<munit-tools:assert-that doc:name="Check number of PC Items" doc:id="1e4888ab-5068-4398-8f99-c2d8d5ecd78b" expression="#[vars.numberOfRecords]" is="#[MunitTools::equalTo(vars.numberOfPcItems)]" message="NumberOfRecords should be equal with numberOfPcItems"/>
+			<munit-tools:assert-that doc:name="Check number of Desk Items" doc:id="cda71df7-81cf-4eb9-b444-7d8277d1b013" expression="#[vars.numberOfRecords]" is="#[MunitTools::equalTo(vars.numberOfDeskItems)]" message="NumberOfRecords should be equal with numberOfDeskItems"/>
 		</munit:validation>
 	</munit:test>
 
@@ -191,7 +191,7 @@ ns ns0 http://www.service-now.com/sys_user
 
 			<munit:after-test name="test-suiteAfter_Test"
 		description="After tests actions" doc:id="5749f7ed-6485-4ac4-99e3-34757be44e64">
-		<foreach doc:name="For Each" doc:id="2fd34ecf-0fe1-48d8-920e-e6425438d602" collection="#[vars.SnowIds]">
+		<foreach doc:name="For Each" doc:id="2fd34ecf-0fe1-48d8-920e-e6425438d602" collection="vars.snowIDs">
 			<ee:transform doc:name="Query for delete request records" doc:id="b6ffaef3-3e7e-46f9-b028-c419b9bf85fd">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
@@ -205,10 +205,6 @@ ns ns0 http://www.service-now.com/sys_user
 }]]></ee:set-payload>
 			</ee:message>
 			<ee:variables >
-					<ee:set-variable variableName="savePayload" ><![CDATA[%dw 2.0
-output application/java
----
-payload]]></ee:set-variable>
 				</ee:variables>
 		</ee:transform>
 			<servicenow:invoke service="sc_request" doc:name="Delete snow records" doc:id="3bacacb2-fa82-40ac-9659-d8b703b944ab" config-ref="ServiceNow_Config" operation="deleteRecord" />

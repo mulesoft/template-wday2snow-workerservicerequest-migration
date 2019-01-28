@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ns4="http://www.mulesoft.org/schema/mule/servicenow" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:workday="http://www.mulesoft.org/schema/mule/workday" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd">
 
+	<global-property name="mule.env" value="dev" doc:name="Global Property" />
 	<workday:config-version-30-config name="Workday_Config_version_30" doc:name="Workday Config version 30" doc:id="dfdc11b9-0fb9-4f77-a68b-3c47c4958506" >
 		<workday:basic-authentication-api-v30-connection username="${wday.username}" password="${wday.password}" tenantName="${wday.tenant}" hostName="${wday.hostname}" responseTimeout="25000"/>
 	</workday:config-version-30-config>
@@ -23,7 +24,6 @@
 	<tls:context name="TLS_Context" doc:id="233e532c-8296-4ddd-ac67-e2b7984b3609" doc:name="TLS Context">
 		<tls:trust-store insecure="true" />
 	</tls:context>
-	<global-property name="mule.env" value="dev" doc:name="Global Property" />
 	<configuration-properties file="common.properties" doc:id="dffa4da7-cc5c-4ecb-922e-1115b4387354" doc:name="Configuration properties" />
 	<configuration-properties file="mule.${mule.env}.properties" doc:id="674beef8-9485-40a7-99b9-0685c9b7e863" doc:name="Configuration properties" />
 </mule>
