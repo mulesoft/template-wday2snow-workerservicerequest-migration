@@ -191,7 +191,7 @@ ns ns0 http://www.service-now.com/sys_user
 
 			<munit:after-test name="test-suiteAfter_Test"
 		description="After tests actions" doc:id="5749f7ed-6485-4ac4-99e3-34757be44e64">
-		<foreach doc:name="For Each" doc:id="2fd34ecf-0fe1-48d8-920e-e6425438d602" collection="vars.snowIDs">
+		<foreach doc:name="For Each" doc:id="2fd34ecf-0fe1-48d8-920e-e6425438d602" collection="vars.SnowIds">
 			<ee:transform doc:name="Query for delete request records" doc:id="b6ffaef3-3e7e-46f9-b028-c419b9bf85fd">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
