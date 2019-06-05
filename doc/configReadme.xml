@@ -7,25 +7,25 @@
 	</placeholders>
 	<sections>
 		<section id="use_case">
-			
+
 			As a Workday admin I want to create 2 service requests in ServiceNow for every new unique worker from Workday
-			
+
 1. one service request for setting up a desk
-2. one service request for setting up a computer	
+2. one service request for setting up a computer
 
 As implemented, this template leverages the Mule batch module.
 The batch job is divided into Input, Process and On Complete stages.
 During the Input stage the template queries Workday for all the existing active workers that match the filtering criteria. The criteria is based on manipulations starting from the given date.
 The Process stage will create new service request assigned to the concrete item - desk or computer in Service Now for each worker.
 Finally, during the On Complete stage the template will print output statistics data into the console and send a notification email with the result of the batch execution.
-			
+
 		</section>
 		<section id="considerations">
 			There are a couple of things you should take into account before running this template:
 
 1. **Workday email uniqueness**: The email can be repeated for two or more accounts (or missing). Therefore Workday accounts with duplicate emails or without email will be removed from processing in the Input stage.
 2. **Workday termination status**: The worker in Workday can be terminated. If worker is terminated, he will be removed from processing in Input stage too.
-			
+
 		</section>
 		<section id="run_it">
 
@@ -48,12 +48,12 @@ Once your app is all set up and started, supposing you choose `wdayworkermigrati
 		</section>
 		<section id="running_on_standalone">
 
-Complete all properties in one of the property files, for example in [mule.prod.properties] (../master/src/main/resources/mule.prod.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=prod`. 
+Complete all properties in one of the property files, for example in [mule.prod.properties] (../master/src/main/resources/mule.prod.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=prod`.
 After this, to trigger the use case you just need to browse to the local HTTP connector with the port you configured in your file. If this is, for instance, `9090` then you should browse to: `http://localhost:9090/migrate` and this will output a summary report and send it in the e-mail.
 
 		</section>
 		<section id="application_configuration">
-			
+
 ### Application configuration
 + http.port `9090`
 + page.size `10`
@@ -64,8 +64,9 @@ After this, to trigger the use case you just need to browse to the local HTTP co
 + wday.password `secret`
 + wday.tenant `tenant`
 + wday.hostname `wd2-impl-services1.workday.com`
++ wday.responseTimeout `25000`
 
-#### ServiceNow Connector 
+#### ServiceNow Connector
 + snow.user `snow_user1`
 + snow.password `ExamplePassword881`
 + snow.endpoint `https://instance.service-now.com`
@@ -82,6 +83,7 @@ After this, to trigger the use case you just need to browse to the local HTTP co
 + snow.desk.price `500`
 
 + snow.location `sysId_of_the_ServiceNow_Location`
++ snow.version `snow_version`
 
 
 #### SMTP Services configuration
@@ -95,13 +97,13 @@ After this, to trigger the use case you just need to browse to the local HTTP co
 + mail.to `user@mulesoft.com`
 + mail.subject `Workers Migration Report`
 
-		  
+
 		</section>
 		<section id="api_calls">
-			There are no special considerations regarding API calls.  
+			There are no special considerations regarding API calls.
 		</section>
 		<section id="default_endpoints_xml">
-		
+
 This file provides the inbound and outbound sides of your integration app.
 This template has only an [HTTP Inbound Endpoint](http://www.mulesoft.org/documentation/display/current/HTTP+Endpoint+Reference) as the way to trigger the use case.
 
@@ -114,7 +116,7 @@ This template has only an [HTTP Inbound Endpoint](http://www.mulesoft.org/docume
 
 		</section>
 		<section id="default_business_logic_xml">
-		
+
 Functional aspect of the Template is implemented on this XML, directed by one flow responsible of excecuting the logic.
 For the pourpose of this particular Template the *mainFlow* just excecutes a batch job. which handles all the logic of it.
 
