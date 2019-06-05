@@ -1,5 +1,5 @@
 
-# Anypoint Template: Workday Worker to ServiceNow Request Migration	
+# Anypoint Template: Workday Worker to ServiceNow Request Migration
 
 <!-- Header (start) -->
 Moves a large set of workers from Workday to ServiceNow where they are created as Service Requests. You can trigger this manually or programmatically with an HTTP call. This means that you can leverage this integration anytime you need a Service Request for a batch of users in ServiceNow. This can be useful in situations where you are changing infrastructure, office space, dealing with an acquisition, etc. This template uses batch to efficiently process many records at a time.
@@ -12,13 +12,13 @@ Install Workday HCM - Human Resources module that you can find on the [Workday c
 <!-- Header (end) -->
 
 # License Agreement
-This template is subject to the conditions of the <a href="https://s3.amazonaws.com/templates-examples/AnypointTemplateLicense.pdf">MuleSoft License Agreement</a>. Review the terms of the license before downloading and using this template. You can use this template for free with the Mule Enterprise Edition, CloudHub, or as a trial in Anypoint Studio. 
+This template is subject to the conditions of the <a href="https://s3.amazonaws.com/templates-examples/AnypointTemplateLicense.pdf">MuleSoft License Agreement</a>. Review the terms of the license before downloading and using this template. You can use this template for free with the Mule Enterprise Edition, CloudHub, or as a trial in Anypoint Studio.
 # Use Case
 <!-- Use Case (start) -->
 As a Workday admin I want to create two service requests in ServiceNow for every new unique worker from Workday:
-			
+
 1. Service request for setting up a desk.
-2. Service request for setting up a computer.	
+2. Service request for setting up a computer.
 
 As implemented, this template leverages the Mule batch module.
 The batch job is divided into Input, Process and On Complete stages.
@@ -107,9 +107,9 @@ After you import your template into Anypoint Studio, follow these steps to run i
 
 ### Run on Mule Standalone
 
-Update the properties in one of the property files, for example in mule.prod.properties, and run your app with a corresponding environment variable. In this example, use `mule.env=prod`. 
+Update the properties in one of the property files, for example in mule.prod.properties, and run your app with a corresponding environment variable. In this example, use `mule.env=prod`.
 
-Complete all properties in one of the property files, for example in mule.prod.properties and run your app with the corresponding environment variable to use it. To follow the example, use `mule.env=prod`. 
+Complete all properties in one of the property files, for example in mule.prod.properties and run your app with the corresponding environment variable to use it. To follow the example, use `mule.env=prod`.
 
 After this, to trigger the use case, browse to the local HTTP connector with the port you configured in your file. If this is, for instance, `9090` then browse to: `http://localhost:9090/migrate` and this outputs a summary report and sends it in the email.
 
@@ -143,8 +143,9 @@ To use this template, configure properties such as credentials, configurations, 
 - wday.password `secret`
 - wday.tenant `tenant`
 - wday.hostname `wd2-impl-services1.workday.com`
+- wday.responseTimeout `25000`
 
-#### ServiceNow Connector 
+#### ServiceNow Connector
 
 - snow.user `snow_user1`
 - snow.password `ExamplePassword881`
@@ -163,6 +164,7 @@ To use this template, configure properties such as credentials, configurations, 
 - snow.desk.price `500`
 
 - snow.location `sysId_of_the_ServiceNow_Location`
+- snow.version `snow_version`
 
 
 #### SMTP Services Configuration

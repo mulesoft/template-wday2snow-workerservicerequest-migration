@@ -1,18 +1,18 @@
 <?xml version='1.0' encoding='utf-8'?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ns4="http://www.mulesoft.org/schema/mule/servicenow" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:workday="http://www.mulesoft.org/schema/mule/workday" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:servicenow="http://www.mulesoft.org/schema/mule/servicenow" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:workday="http://www.mulesoft.org/schema/mule/workday" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mule/servicenow/current/mule-servicenow.xsd http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd">
 
 	<global-property name="mule.env" value="dev" doc:name="Global Property" />
 	<workday:config-version-30-config name="Workday_Config_version_30" doc:name="Workday Config version 30" doc:id="dfdc11b9-0fb9-4f77-a68b-3c47c4958506" >
-		<workday:basic-authentication-api-v30-connection username="${wday.username}" password="${wday.password}" tenantName="${wday.tenant}" hostName="${wday.hostname}" responseTimeout="25000"/>
+		<workday:basic-authentication-api-v30-connection username="${wday.username}" password="${wday.password}" tenantName="${wday.tenant}" hostName="${wday.hostname}" responseTimeout="${wday.responseTimeout}"/>
 	</workday:config-version-30-config>
-	
-	<ns4:config name="ServiceNow_Config" doc:id="2fe308e9-32e7-4635-8d56-5f9ca32bbde0" doc:name="ServiceNow Config">
-		<ns4:basic-connection password="${snow.password}" serviceAddress="${snow.endpoint}" serviceNowVersion="JAKARTA" username="${snow.user}">
-			<ns4:transport>
-				<ns4:basic-auth-http-message-dispatcher-provider password="${snow.password}" username="${snow.user}" />
-			</ns4:transport>
-		</ns4:basic-connection>
-	</ns4:config>
+
+	<servicenow:config name="ServiceNow_Config" doc:id="2fe308e9-32e7-4635-8d56-5f9ca32bbde0" doc:name="ServiceNow Config">
+		<servicenow:basic-connection password="${snow.password}" serviceAddress="${snow.endpoint}" serviceNowVersion="${snow.version}" username="${snow.user}">
+			<servicenow:transport>
+				<servicenow:basic-auth-http-message-dispatcher-provider password="${snow.password}" username="${snow.user}" />
+			</servicenow:transport>
+		</servicenow:basic-connection>
+	</servicenow:config>
 
 	<http:listener-config name="HTTP_Listener_config" doc:id="910654bf-9fd9-4073-bad4-cf951b7f0022" doc:name="HTTP Listener config">
 		<http:listener-connection host="0.0.0.0" port="${http.port}" />
