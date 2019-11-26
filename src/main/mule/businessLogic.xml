@@ -112,7 +112,7 @@ ns ns0 urn:com.workday/bsvc
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<workday:human-resources operation="Get_Workers" doc:name="Human resources" doc:id="a8ec0579-724b-468c-ab62-fac84ef5719f" config-ref="Workday_Config_version_30" />
+		<workday:human-resources operation="Get_Workers" doc:name="Human resources" doc:id="a8ec0579-724b-468c-ab62-fac84ef5719f" config-ref="Workday_Config" />
 		<ee:transform doc:name="Extract a list of Workers"
 			doc:id="5a58df8e-a294-443e-a205-565002d91050">
 			<ee:message>

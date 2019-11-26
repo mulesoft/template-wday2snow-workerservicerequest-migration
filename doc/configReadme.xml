@@ -64,7 +64,6 @@ After this, to trigger the use case you just need to browse to the local HTTP co
 + wday.password `secret`
 + wday.tenant `tenant`
 + wday.hostname `wd2-impl-services1.workday.com`
-+ wday.responseTimeout `25000`
 
 #### ServiceNow Connector
 + snow.user `snow_user1`

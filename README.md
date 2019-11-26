@@ -143,7 +143,6 @@ To use this template, configure properties such as credentials, configurations, 
 - wday.password `secret`
 - wday.tenant `tenant`
 - wday.hostname `wd2-impl-services1.workday.com`
-- wday.responseTimeout `25000`
 
 #### ServiceNow Connector
 
